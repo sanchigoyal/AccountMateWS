@@ -1,0 +1,77 @@
+#success h3 {
+	color:#00CC00;
+}
+
+.largeIcon{
+	font-size:15px;
+	padding-left:15px;
+}
+
+.extraPadding20{
+	padding-left:20px;
+}
+.extraPaddingLeftRight5{
+	padding-left:5px;
+	padding-right:5px;
+}
+
+.extraPaddingRight20{
+	padding-right:20px;
+}
+.extraPaddingTop20{
+	padding-top:20px;
+}
+
+.extraPaddingBottom20{
+	padding-bottom:20px;
+}
+.addLineSeperator{
+	border-right: solid #CCCCCC;
+	padding-right:10px;
+	margin-right:10px;
+}
+.pointerCursor{
+	cursor: pointer;
+}
+.hideIt{
+	display:none;
+}
+.form{
+	padding-left:10px;
+}
+
+.extraMarginLeft20{
+	margin-left:20px;
+}
+
+.extraMarginRight20{
+	margin-right:20px;
+}
+.text-green{
+	color:#00CC33;
+}
+
+.text-red{
+	color:#D80000;
+}
+
+.modal-dialog.large {
+  width: 60%; /* desired relative width */
+  /* place center */
+  margin-left:auto;
+  margin-right:auto; 
+}
+
+.panel-heading a:after {
+    font-family:'Glyphicons Halflings';
+    content:"\e114";
+    float: right;
+    color: grey;
+}
+.panel-heading a.collapsed:after {
+    content:"\e080";
+}
+
+.marginTopLift20{
+	margin-top: -20px !important;
+}

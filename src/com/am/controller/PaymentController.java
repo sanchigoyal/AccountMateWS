@@ -1,0 +1,332 @@
+package com.am.controller;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.am.model.bean.ClientBean;
+import com.am.model.bean.InvoiceBean;
+import com.am.model.bean.PaymentBean;
+import com.am.model.dao.ClientDAO;
+import com.am.model.dao.ClientDAOImpl;
+import com.am.model.dao.InvoiceDAO;
+import com.am.model.dao.InvoiceDAOImpl;
+import com.am.model.dao.PaymentDAO;
+import com.am.model.dao.PaymentDAOImpl;
+
+
+@Controller
+public class PaymentController {
+	private double total =0;
+	private double totalOutstanding =0;
+	private double subTotal =0;
+	private double vatTotal =0;
+	ClientDAO clientDAO = new ClientDAOImpl();	
+	InvoiceDAO invoiceDAO = new InvoiceDAOImpl();
+	PaymentDAO paymentDAO = new PaymentDAOImpl();
+	
+	static Logger LOGGER = Logger.getLogger(PaymentController.class.getName());
+	
+	@RequestMapping(value = "/getInvoicePaymentDetails", method = RequestMethod.GET)
+	public ModelAndView getInvoicePaymentDetails(@RequestParam("invoiceid") String invoiceid,HttpServletRequest request, ModelMap model) {
+		HttpSession session = request.getSession();
+		InvoiceBean invoice = new InvoiceBean();
+		invoice.setInvoiceID(Integer.parseInt(invoiceid));
+		invoice.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
+		LOGGER.info("Request to get Invoice Payment Detail :: Invoice ID - "+invoice.getInvoiceID()+" :: User - "+invoice.getUserID());
+		invoiceDAO.getInvoiceDetails(invoice);
+		List<InvoiceBean> invoices= new ArrayList<InvoiceBean>();
+		List<ClientBean> clients = new ArrayList<ClientBean>();
+		ClientBean client = new ClientBean();
+		client.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
+		client.setClientID(invoice.getClientID());
+		clientDAO.getClientDetails(client);
+		invoices.add(invoice);
+		clients.add(client);
+		getTotalOutstanding(invoices);
+		model.addAttribute("invoices",invoices);
+		model.addAttribute("invoicesList",invoices);
+		model.addAttribute("clients",clients);
+		model.addAttribute("subTotal",subTotal);
+		model.addAttribute("vatTotal",vatTotal);
+		model.addAttribute("total",total);
+		model.addAttribute("outstandingAmount",totalOutstanding);
+		List<ClientBean> banks = new ArrayList<ClientBean>();
+		clientDAO.getClientsDetails(client.getUserID(),banks,4);
+	    model.addAttribute("banks",banks);
+		ModelAndView mav = new ModelAndView();
+		String viewName = "paymentgateway";
+		mav.setViewName(viewName);
+		return mav;
+	}
+	
+	@RequestMapping(value = "/viewPayment", method = RequestMethod.GET)
+	public ModelAndView viewInvoice(@RequestParam("paymentid") String paymentid,HttpServletRequest request, ModelMap model) {
+		HttpSession session = request.getSession();
+		PaymentBean payment = new PaymentBean();
+		payment.setPaymentID(Integer.parseInt(paymentid));
+		payment.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
+		LOGGER.info("Request to view payment :: Payment ID - "+payment.getPaymentID()+" :: User - "+payment.getUserID());
+		List<InvoiceBean> invoices = new ArrayList<InvoiceBean>();
+		paymentDAO.getPaymentDetails(payment,invoices);
+		model.addAttribute("payment",payment);
+		model.addAttribute("invoices",invoices);
+		ModelAndView mav = new ModelAndView();
+		String viewName = "payment";
+		mav.setViewName(viewName);
+		return mav;
+	}
+	
+	@RequestMapping(value = "/getInvoicesPaymentDetails", method = RequestMethod.GET)
+	public ModelAndView getInvoicesPaymentDetails(@RequestParam("invoicelist") String invoicelist,HttpServletRequest request, ModelMap model) {
+		HttpSession session = request.getSession();
+		List<String> invoiceList = Arrays.asList(invoicelist.split(","));
+		int userid = Integer.parseInt((String)session.getAttribute("userid"));
+		LOGGER.info("Request to get Invoices Payment Details :: Invoices - "+invoicelist+" :: User - "+userid);
+		InvoiceBean invoice = null;
+		List<InvoiceBean> invoices= new ArrayList<InvoiceBean>();
+		for(String invoiceid : invoiceList){
+			if(invoiceid != null && !invoiceid.isEmpty()){	
+				invoice = new InvoiceBean();
+				invoice.setInvoiceID(Integer.parseInt(invoiceid));
+				invoice.setUserID(userid);
+				invoiceDAO.getInvoiceDetails(invoice);
+				invoices.add(invoice);
+			}
+		}
+		getTotalOutstanding(invoices);
+		model.addAttribute("invoicesList",invoices);
+		model.addAttribute("subTotal",subTotal);
+		model.addAttribute("vatTotal",vatTotal);
+		model.addAttribute("total",total);
+		model.addAttribute("outstandingAmount",totalOutstanding);
+		ModelAndView mav = new ModelAndView();
+		String viewName = "paymentgatewaytables";
+		mav.setViewName(viewName);
+		return mav;
+	}
+	
+	@RequestMapping(value = "/checkCashBalanceAvailability", method = RequestMethod.GET)
+	public @ResponseBody String checkCashBalanceAvailability(@RequestParam("amount") String amount,HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		double balance =0;
+		LOGGER.info("Request to check cash balance availability :: User - "+session.getAttribute("userid"));
+		balance = paymentDAO.getCashBalance(Integer.parseInt((String)session.getAttribute("userid")));
+		if(balance > Double.parseDouble(amount)){
+			return "yes";
+		}
+		return "no";
+	}
+	
+	@RequestMapping("/recordPayment")
+	 public String recordPayment(ModelMap model,HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		if(session.getAttribute("userid")== null){
+			return "home";
+		}
+		int userid=Integer.parseInt((String)session.getAttribute("userid"));
+		LOGGER.info("Request to Payment Gateway :: User - "+userid);
+		List<ClientBean> clients = new ArrayList<ClientBean>();
+		List<InvoiceBean> invoices = new ArrayList<InvoiceBean>();
+		clientDAO.getClientsDetails(userid,clients,2);
+		invoices = invoiceDAO.getUnpaidInvoiceList(clients.get(0),1);
+		model.addAttribute("clients",clients);
+		model.addAttribute("invoices",invoices);
+		List<ClientBean> banks = new ArrayList<ClientBean>();
+		clientDAO.getClientsDetails(userid,banks,4);
+	    model.addAttribute("banks",banks);
+		return "recordpayment";
+	}
+	@RequestMapping("/savePaymentDetails")
+	public String savePaymentDetails(ModelMap model, HttpServletRequest request){
+		boolean flag=false;
+		HttpSession session = request.getSession();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		Map<String,String> dates = new HashMap<String,String>();
+		if(session.getAttribute("userid")== null){
+			return "home";
+		}
+		LOGGER.info("Request to save payment details :: User - "+session.getAttribute("userid"));
+		PaymentBean payment = null;
+		try{
+			if(request.getParameter("billWisePayment") != null){
+				//bill wise payment
+				payment=extractBillWisePaymentDetails(request);
+				processBillWisePaymentDetails(payment);
+				payment.setPaymentDate(formatter.parse(request.getParameter("paydate")));
+				flag=paymentDAO.saveBillWisePayment(payment);
+			}
+			else{
+				payment=extractPaymentDetails(request);
+				payment.setPaymentDate(formatter.parse(request.getParameter("paydate")));
+				flag=paymentDAO.savePayment(payment);
+			}
+		}
+		catch (ParseException pe) {
+			LOGGER.error(pe.getMessage(),pe);
+			model.addAttribute("success","false");
+			model.addAttribute("message","Failed to make payment. Please check with support team for assistance.");
+		}
+		String requestFrom =request.getParameter("requestfrom");
+		if(flag){
+			model.addAttribute("success","true");
+			model.addAttribute("message","Payment Successfull.");
+			LOGGER.info("Payment Successfull :: User - "+payment.getUserID());
+		}else{
+			model.addAttribute("success","false");
+			model.addAttribute("message","Failed to make payment.");
+			LOGGER.error("Failed to make payment :: User - "+payment.getUserID());
+		}
+		
+		if(requestFrom != null && !requestFrom.equals("") && !requestFrom.isEmpty() &&requestFrom.equals("modal")){
+			dates.put("startdate",request.getParameter("requestdatefrom"));
+			dates.put("enddate", request.getParameter("requestdateto"));
+			List<InvoiceBean> invoicesPaid = new ArrayList<InvoiceBean>();
+			List<InvoiceBean> invoicesUnPaid = new ArrayList<InvoiceBean>();
+			List<InvoiceBean> deletedInvoices = new ArrayList<InvoiceBean>();
+			invoiceDAO.getInvoicesDetails(invoicesPaid,invoicesUnPaid,deletedInvoices,dates,payment.getUserID(),1);
+			model.addAttribute("invoicesP",invoicesPaid);
+			model.addAttribute("invoicesUP",invoicesUnPaid);
+			model.addAttribute("deletedinvoices",deletedInvoices);
+			model.addAttribute("startdate",dates.get("startdate"));
+			model.addAttribute("enddate",dates.get("enddate"));
+			model.addAttribute("unpaidBills",invoicesUnPaid.size());
+			model.addAttribute("paidBills",invoicesPaid.size());
+			model.addAttribute("deletedBills",deletedInvoices.size());
+			//Get total outstanding amount
+			getTotalOutstanding(invoicesPaid);
+			model.addAttribute("paidTotal",total);
+			getTotalOutstanding(invoicesUnPaid);
+			model.addAttribute("unpaidOutstanding",totalOutstanding);
+			model.addAttribute("unpaidTotal",total);
+			return "purchasebook";
+		}
+		
+		List<ClientBean> clients = new ArrayList<ClientBean>();
+		List<InvoiceBean> invoices = new ArrayList<InvoiceBean>();
+		clientDAO.getClientsDetails(payment.getUserID(),clients,2);
+		invoices = invoiceDAO.getUnpaidInvoiceList(clients.get(0),1);
+		List<ClientBean> banks = new ArrayList<ClientBean>();
+		clientDAO.getClientsDetails(payment.getUserID(),banks,4);
+	    model.addAttribute("banks",banks);
+		model.addAttribute("clients",clients);
+		model.addAttribute("invoices",invoices);
+		return "recordpayment";
+	}
+	
+	private void getTotalOutstanding(List<InvoiceBean> invoices){
+		total = 0;
+		totalOutstanding =0;
+		vatTotal =0;
+		subTotal =0;
+		for(InvoiceBean invoice : invoices){
+			subTotal +=invoice.getSubTotal();
+			vatTotal +=invoice.getVatTotal();
+			total += invoice.getTotal();
+			totalOutstanding +=invoice.getOutstandingAmount();
+		}
+	}
+	private void processBillWisePaymentDetails(PaymentBean payment){
+		//Logic for processing payment
+		Map<Integer,Double> invoicesOutstanding = new HashMap<Integer,Double>();
+		Map<Integer,Double> invoiceList = payment.getInvoiceList();
+		InvoiceBean invoice = null;
+		for(int invoiceID : invoiceList.keySet()){
+			invoice = new InvoiceBean();
+			invoice.setInvoiceID(invoiceID);
+			invoice.setUserID(payment.getUserID());
+			invoiceDAO.getInvoiceDetails(invoice);
+			invoicesOutstanding.put(invoiceID,invoice.getOutstandingAmount());
+		}
+		 invoicesOutstanding = sortByValue(invoicesOutstanding);
+		 double tempPaidAmount = payment.getPaidAmount();
+		 for(int invoiceid: invoiceList.keySet()){
+			 if(tempPaidAmount != 0){
+				 if(invoicesOutstanding.get(invoiceid) <= tempPaidAmount){
+					 invoiceList.put(invoiceid,0.0);
+					 tempPaidAmount -= invoicesOutstanding.get(invoiceid);
+				 }
+				 else{
+					 invoiceList.put(invoiceid, invoicesOutstanding.get(invoiceid)-tempPaidAmount);
+					 tempPaidAmount = 0;
+				 }
+			 }
+			 else{
+				 invoiceList.put(invoiceid, invoicesOutstanding.get(invoiceid));
+			 }
+		 }
+		 payment.setInvoiceList(invoiceList);
+	}
+	
+	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue( Map<K, V> map )
+	{
+	    List<Map.Entry<K, V>> list =
+	        new LinkedList<>( map.entrySet() );
+	    Collections.sort( list, new Comparator<Map.Entry<K, V>>()
+	    {
+	        @Override
+	        public int compare( Map.Entry<K, V> o1, Map.Entry<K, V> o2 )
+	        {
+	            return (o1.getValue()).compareTo( o2.getValue() );
+	        }
+	    } );
+	
+	    Map<K, V> result = new LinkedHashMap<>();
+	    for (Map.Entry<K, V> entry : list)
+	    {
+	        result.put( entry.getKey(), entry.getValue() );
+	    }
+	    return result;
+	}
+	private PaymentBean extractBillWisePaymentDetails(HttpServletRequest request){
+		PaymentBean payment = new PaymentBean();
+		HttpSession session = request.getSession();
+		Map<Integer,Double> invoiceList = new HashMap<Integer,Double>();
+		payment.setClientID(Integer.parseInt(request.getParameter("clientname")));
+		for(String invoiceid : Arrays.asList(request.getParameterValues("billnumber"))){
+			invoiceList.put(Integer.parseInt(invoiceid),0.0);
+		}
+		payment.setInvoiceList(invoiceList);
+		payment.setPaidAmount(Double.parseDouble(request.getParameter("pay")));
+		payment.setModeOfPayment(Integer.parseInt(request.getParameter("mop")));
+		payment.setCashDetails(request.getParameter("cashdetails"));
+		payment.setBankID(Integer.parseInt(request.getParameter("bank")));
+		payment.setChequeNumber(request.getParameter("chequeNumber"));
+		payment.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
+		return payment;
+	}
+	
+	private PaymentBean extractPaymentDetails(HttpServletRequest request){
+		PaymentBean payment = new PaymentBean();
+		HttpSession session = request.getSession();
+		payment.setClientID(Integer.parseInt(request.getParameter("clientname")));
+		payment.setPaidAmount(Double.parseDouble(request.getParameter("pay")));
+		payment.setModeOfPayment(Integer.parseInt(request.getParameter("mop")));
+		payment.setCashDetails(request.getParameter("cashdetails"));
+		payment.setBankID(Integer.parseInt(request.getParameter("bank")));
+		payment.setChequeNumber(request.getParameter("chequeNumber"));
+		payment.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
+		return payment;
+	}
+}
