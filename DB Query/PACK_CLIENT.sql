@@ -155,7 +155,20 @@ from
             AND ct.reference_type_id = trt.reference_type_id
             AND ct.reference_id = e.expense_id
             AND e.close_action_id is null
-			AND trt.reference_type = 'EXPENSE') st
+			AND trt.reference_type = 'EXPENSE' UNION ALL 
+	 SELECT 
+        c.client_id,c.account_name,c.first_name,c.last_name,c.email,c.phone_number,c.country,c.state,c.address,
+		cc.category AS CLIENT_CATEGORY,c.tin_number,ct.transaction_details,ct.debit_value,ct.credit_value
+     FROM
+        client c, client_transaction ct, client_category cc,transaction_reference_type trt
+     WHERE
+        c.user_id = userID
+            AND c.close_action_id is null
+            AND c.client_id = ct.client_id
+            AND c.client_category = cc.category_id
+            #AND cc.category in ('Sundry Debtor' , 'Sundry Creditor')
+            AND ct.reference_type_id = trt.reference_type_id
+			AND trt.reference_type = 'RECEIPT') st
 GROUP BY st.client_id
 ORDER BY st.account_name;
 else
@@ -217,7 +230,20 @@ from
             AND ct.reference_type_id = trt.reference_type_id
             AND ct.reference_id = e.expense_id
             AND e.close_action_id is null
-			AND trt.reference_type = 'INVOICE') st
+			AND trt.reference_type = 'EXPENSE' UNION ALL 
+	 SELECT 
+        c.client_id,c.account_name,c.first_name,c.last_name,c.email,c.phone_number,c.country,c.state,c.address,
+		cc.category AS CLIENT_CATEGORY,c.tin_number,ct.transaction_details,ct.debit_value,ct.credit_value
+     FROM
+        client c, client_transaction ct,client_category cc,transaction_reference_type trt
+     WHERE
+        c.user_id = userID
+            AND c.close_action_id is null
+            AND c.client_id = ct.client_id
+            AND c.client_category = cc.category_id
+			AND cc.category_id = categoryID
+            AND ct.reference_type_id = trt.reference_type_id
+			AND trt.reference_type = 'RECEIPT') st
 GROUP BY st.client_id
 ORDER BY st.account_name;
 end if;
@@ -329,7 +355,22 @@ SELECT ct.transaction_id, ct.client_id,ct.transaction_details AS detail,ct.trans
 		and trt.reference_type = 'EXPENSE'
 		and e.user_id = userID
 		and e.expense_id = ct.reference_id
-		and e.close_action_id is null)st
+		and e.close_action_id is null
+UNION ALL
+SELECT ct.transaction_id, ct.client_id,ct.transaction_details AS detail,ct.transaction_type_id,ct.transaction_date,
+		ct.debit_value,ct.credit_value,ct.balance,ct.reference_id,trt.reference_type
+		,ct.reference_id AS reference_number
+	FROM client_transaction ct,
+		client c,
+		transaction_reference_type trt
+	WHERE
+		c.user_id = userID
+		and c.client_id =clientID
+		and ct.client_id = c.client_id
+		and c.close_action_id is null	
+		and ct.transaction_date between startdate and enddate
+		and ct.reference_type_id = trt.reference_type_id
+		and trt.reference_type = 'RECEIPT')st
 ORDER BY st.transaction_date,reference_number;
 END//
 DELIMITER ;

@@ -313,7 +313,7 @@
 
 			success : function(data) {
 				$('#receipt-content').html(data);
-				$('#cashpayment').hide();
+				//$('#cashpayment').hide();
 				$('#chequepayment').hide();
 				$("#clientname").select2();
 				$("#billnumber").select2();
@@ -321,7 +321,7 @@
 				$("#billWiseReceipt").prop('checked', true);
 				$("#pay").prop("readonly",true);
 				$('#cashfailure').hide();
-				$('#receiptbutton').hide();
+				//$('#receiptbutton').hide();
 				$('#requestfrom').val('modal');
 				$('#requestdatefrom').val('${startdate}');
 				$('#requestdateto').val('${enddate}');

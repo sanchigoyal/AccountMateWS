@@ -186,7 +186,7 @@ public class ReceiptDAOImpl implements ReceiptDAO {
 	        	invoice.setSubTotal(rs2.getDouble("sub_total"));
 	        	invoice.setVatTotal(rs2.getDouble("vat_total"));
 	        	invoice.setTotal(rs2.getDouble("total"));
-	        	invoice.setOutstandingAmount(rs2.getDouble("paid_amount"));
+	        	invoice.setOutstandingAmount(rs2.getDouble("receipt_amount"));
 	        	invoices.add(invoice);
 	        }
 		}

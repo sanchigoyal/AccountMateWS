@@ -180,15 +180,27 @@ CREATE PROCEDURE getUnpaidInvoiceList(
 		 IN invoiceTypeID INT
          )
 BEGIN
-select 
-    invoice_id, invoice_number
-from
-    invoice
-where 
-		invoice_type_id = invoiceTypeID and paid = 'N'
-        and client_id = clientID
-        and user_id = userID
-		and close_action_id is null;
+if invoiceTypeID =1 then 
+	select 
+		invoice_id, invoice_number
+	from
+		invoice
+	where 
+			invoice_type_id = 1 and paid = 'N'
+			and client_id = clientID
+			and user_id = userID
+			and close_action_id is null;
+else
+	select 
+		invoice_id, invoice_number
+	from
+		invoice
+	where 
+			invoice_type_id <> 1 and paid = 'N'
+			and client_id = clientID
+			and user_id = userID
+			and close_action_id is null;
+end if;
 END//
 DELIMITER ;
 

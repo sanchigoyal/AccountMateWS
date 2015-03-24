@@ -177,8 +177,25 @@
 				}
 			});
 		}
+		else if(referencetype == 'RECEIPT'){
+			var data = 'receiptid='
+				+ encodeURIComponent(referenceid);
+			$.ajax({
+				url : "/AccountmateWS/viewReceipt",
+				data : data,
+				type : "GET",
+
+				success : function(data) {
+					$('#reference-content').html(data);
+				},
+				error : function(xhr, status, error) {
+					alert(xhr.responseText);
+				}
+			});
+
+		}
 		else{
-			alert("For Receipts");
+			alert('Invalid Data !!!!');
 		}
 	}	
 	</script>

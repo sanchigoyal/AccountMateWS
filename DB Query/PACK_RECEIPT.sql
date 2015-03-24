@@ -95,7 +95,7 @@ BEGIN
 	select i.invoice_id ,i.invoice_number,i.sub_total,i.vat_total,i.total,ri.amount receipt_amount from 
 	receipt_invoice ri,
 	invoice i 
-	where ri.payment_id =receiptID
+	where ri.receipt_id =receiptID
 	and ri.invoice_id =i.invoice_id
 	and i.close_action_id is null;
 	END//
