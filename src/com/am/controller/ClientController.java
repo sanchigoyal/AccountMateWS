@@ -64,7 +64,7 @@ public class ClientController {
 				model.addAttribute("category",category);
 		}
 		else{
-			LOGGER.debug("Requested Product Category - All(-1) :: User - "+userid);
+			LOGGER.debug("Requested Client Category - All(-1) :: User - "+userid);
 			totalBalance=clientDAO.getClientsDetails(userid, clients, -1);
 			model.addAttribute("category",-1);
 		}

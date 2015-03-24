@@ -153,7 +153,9 @@ public class ReceiptController {
 		List<ClientBean> clients = new ArrayList<ClientBean>();
 		List<InvoiceBean> invoices = new ArrayList<InvoiceBean>();
 		clientDAO.getClientsDetails(userid,clients,1);
-		invoices = invoiceDAO.getUnpaidInvoiceList(clients.get(0),2);
+		if(clients.size()>0){
+			invoices = invoiceDAO.getUnpaidInvoiceList(clients.get(0),2);
+		}
 		model.addAttribute("clients",clients);
 		model.addAttribute("invoices",invoices);
 		List<ClientBean> banks = new ArrayList<ClientBean>();

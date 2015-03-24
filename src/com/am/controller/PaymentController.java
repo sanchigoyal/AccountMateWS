@@ -150,7 +150,9 @@ public class PaymentController {
 		List<ClientBean> clients = new ArrayList<ClientBean>();
 		List<InvoiceBean> invoices = new ArrayList<InvoiceBean>();
 		clientDAO.getClientsDetails(userid,clients,2);
-		invoices = invoiceDAO.getUnpaidInvoiceList(clients.get(0),1);
+		if(clients.size()>0){
+			invoices = invoiceDAO.getUnpaidInvoiceList(clients.get(0),1);
+		}
 		model.addAttribute("clients",clients);
 		model.addAttribute("invoices",invoices);
 		List<ClientBean> banks = new ArrayList<ClientBean>();
