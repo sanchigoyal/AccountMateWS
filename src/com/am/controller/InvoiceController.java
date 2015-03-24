@@ -325,6 +325,7 @@ public class InvoiceController {
 		Map<String,String> dates = new HashMap<String,String>();
 		dates.put("startdate",request.getParameter("redirectstartdate"));
 		dates.put("enddate", request.getParameter("redirectenddate"));
+		String redirectPage = request.getParameter("redirectpage");
 		LOGGER.debug("Requested Date Range - "+dates.get("startdate")+" to "+dates.get("enddate")+" :: User - "+invoice.getUserID());
 		flag=invoiceDAO.deleteInvoice(invoice);
 		if(flag){
@@ -340,7 +341,11 @@ public class InvoiceController {
 		List<InvoiceBean> invoicesPaid = new ArrayList<InvoiceBean>();
 		List<InvoiceBean> invoicesUnPaid = new ArrayList<InvoiceBean>();
 		List<InvoiceBean> deletedInvoices = new ArrayList<InvoiceBean>();
-		invoiceDAO.getInvoicesDetails(invoicesPaid,invoicesUnPaid,deletedInvoices,dates,invoice.getUserID(),1);
+		if(redirectPage.equals("purchasebook")){
+			invoiceDAO.getInvoicesDetails(invoicesPaid,invoicesUnPaid,deletedInvoices,dates,invoice.getUserID(),1);
+		}else{
+			invoiceDAO.getInvoicesDetails(invoicesPaid,invoicesUnPaid,deletedInvoices,dates,invoice.getUserID(),2);
+		}
 		model.addAttribute("invoicesP",invoicesPaid);
 		model.addAttribute("invoicesUP",invoicesUnPaid);
 		model.addAttribute("deletedinvoices",deletedInvoices);
@@ -354,7 +359,7 @@ public class InvoiceController {
 		getTotalOutstanding(invoicesUnPaid);
 		model.addAttribute("unpaidOutstanding",totalOutstanding);
 		model.addAttribute("unpaidTotal",total);
-		return "purchasebook";
+		return redirectPage;
 	}
 	
 	private void getTotalOutstanding(List<InvoiceBean> invoices){

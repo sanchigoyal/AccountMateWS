@@ -16,7 +16,3 @@ INSERT INTO invoice_number_audit values(null,2,3,'2000-01-01',0,10000,null,10000
 
 
 
-
-
-
-

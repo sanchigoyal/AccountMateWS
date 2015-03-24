@@ -103,29 +103,55 @@ CREATE PROCEDURE getInvoicesDetails(
 		 IN invoiceType INT
          )
 BEGIN
-select i.invoice_id,c.account_name,i.client_tin AS TIN_NUMBER,
-		i.invoice_date,i.invoice_number,it.invoice_type,
-		i.reference,i.shipped_method,i.shipped_to,
-		i.sub_total,i.vat_total,i.total,i.paid,i.outstanding_amt, 'Y' as ACTIVE
-from invoice i ,client c,invoice_type it
-where i.user_id = userID
-and it.invoice_type_id = invoiceType
-and i.invoice_type_id =it.invoice_type_id
-and c.client_id = i.client_id
-and i.invoice_date between startdate and enddate
-and i.close_action_id  is null
-UNION ALL
-select i.invoice_id,c.account_name,i.client_tin AS TIN_NUMBER,
-		i.invoice_date,i.invoice_number,it.invoice_type,
-		i.reference,i.shipped_method,i.shipped_to,
-		i.sub_total,i.vat_total,i.total,i.paid,i.outstanding_amt, 'N' as ACTIVE
-from invoice i ,client c,invoice_type it
-where i.user_id = userID
-and it.invoice_type_id = invoiceType
-and i.invoice_type_id =it.invoice_type_id
-and c.client_id = i.client_id
-and i.invoice_date between startdate and enddate
-and i.close_action_id  is not null;
+if invoiceType = 1 then 
+	select i.invoice_id,c.account_name,i.client_tin AS TIN_NUMBER,
+			i.invoice_date,i.invoice_number,it.invoice_type,
+			i.reference,i.shipped_method,i.shipped_to,
+			i.sub_total,i.vat_total,i.total,i.paid,i.outstanding_amt, 'Y' as ACTIVE
+	from invoice i ,client c,invoice_type it
+	where i.user_id = userID
+	and it.invoice_type_id = invoiceType
+	and i.invoice_type_id =it.invoice_type_id
+	and c.client_id = i.client_id
+	and i.invoice_date between startdate and enddate
+	and i.close_action_id  is null
+	UNION ALL
+	select i.invoice_id,c.account_name,i.client_tin AS TIN_NUMBER,
+			i.invoice_date,i.invoice_number,it.invoice_type,
+			i.reference,i.shipped_method,i.shipped_to,
+			i.sub_total,i.vat_total,i.total,i.paid,i.outstanding_amt, 'N' as ACTIVE
+	from invoice i ,client c,invoice_type it
+	where i.user_id = userID
+	and it.invoice_type_id = invoiceType
+	and i.invoice_type_id =it.invoice_type_id
+	and c.client_id = i.client_id
+	and i.invoice_date between startdate and enddate
+	and i.close_action_id  is not null;
+else
+	select i.invoice_id,c.account_name,i.client_tin AS TIN_NUMBER,
+			i.invoice_date,i.invoice_number,it.invoice_type,
+			i.reference,i.shipped_method,i.shipped_to,
+			i.sub_total,i.vat_total,i.total,i.paid,i.outstanding_amt, 'Y' as ACTIVE
+	from invoice i ,client c,invoice_type it
+	where i.user_id = userID
+	and it.invoice_type_id <> 1
+	and i.invoice_type_id =it.invoice_type_id
+	and c.client_id = i.client_id
+	and i.invoice_date between startdate and enddate
+	and i.close_action_id  is null
+	UNION ALL
+	select i.invoice_id,c.account_name,i.client_tin AS TIN_NUMBER,
+			i.invoice_date,i.invoice_number,it.invoice_type,
+			i.reference,i.shipped_method,i.shipped_to,
+			i.sub_total,i.vat_total,i.total,i.paid,i.outstanding_amt, 'N' as ACTIVE
+	from invoice i ,client c,invoice_type it
+	where i.user_id = userID
+	and it.invoice_type_id <> 1
+	and i.invoice_type_id =it.invoice_type_id
+	and c.client_id = i.client_id
+	and i.invoice_date between startdate and enddate
+	and i.close_action_id  is not null;
+end if;
 END//
 DELIMITER ;
 

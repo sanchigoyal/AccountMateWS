@@ -228,6 +228,7 @@
 								<input type="hidden" id="deleteinvoiceid" name="invoiceID" value = ""/>
 								<input type="hidden" id="redirectstartdate" name="redirectstartdate" value = ""/>
 								<input type="hidden" id="redirectenddate" name="redirectenddate" value =""/>
+								<input type="hidden" id="redirectpage" name="redirectpage" value="salesbook"/>
 								<button id="deletebutton" type="submit" class="btn btn-danger">Delete</button>
 								<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
 							</form:form>
