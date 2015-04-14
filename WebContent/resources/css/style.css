@@ -75,3 +75,16 @@
 .marginTopLift20{
 	margin-top: -20px !important;
 }
+
+.edit-input {
+    display:none;
+}
+
+.modalChange
+{
+    overflow: hidden;
+}
+.modal-dialogChange{
+    margin-right: 0;
+    margin-left: 0;
+}

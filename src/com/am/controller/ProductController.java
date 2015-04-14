@@ -24,6 +24,7 @@ import com.am.model.bean.ProductBean;
 import com.am.model.bean.TransactionBean;
 import com.am.model.dao.ProductDAO;
 import com.am.model.dao.ProductDAOImpl;
+import com.am.constants.AccountConstants;
 
 @Controller
 public class ProductController {
@@ -31,69 +32,132 @@ public class ProductController {
 	static Logger LOGGER = Logger.getLogger(ProductController.class.getName());
 	ProductDAO productDAO = new ProductDAOImpl();
 	
+	/**
+	 * Method to redirect to create product page
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/newProduct")
 	   public String createNewProduct(ModelMap model,HttpServletRequest request) {
 		  List<CategoryBean> categories = new ArrayList<CategoryBean>();
 		  HttpSession session = request.getSession();
-			if(session.getAttribute("userid")== null){
+			if(session.getAttribute(AccountConstants.USER_NAME)== null){
 				return "home";
 			}
-		  int userid=Integer.parseInt((String)session.getAttribute("userid"));
+		  int userid=Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME));
 		  productDAO.getCategoryDetails(userid, categories);
 	      model.addAttribute("categories",categories);
 	      model.addAttribute("command",new ProductBean());
 	      return "newproduct";
 	   }
 	
+	/**
+	 * Method to return list of products based on the requested category
+	 * @param pBean
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/productList")
 	 public String getProductList(@ModelAttribute("AccountmateWS")ProductBean pBean, 
 			   ModelMap model,HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
-		if(session.getAttribute("userid")== null){
+		List<ProductBean> products = new ArrayList<ProductBean>();
+		int category =0;
+		double totalStockValue = 0;
+		// Check if session exists
+		if(session.getAttribute(AccountConstants.USER_NAME)== null){
 			return "home";
 		}
-		int userid=Integer.parseInt((String)session.getAttribute("userid"));
-		int category =0;
-		List<ProductBean> products = new ArrayList<ProductBean>();
-		double totalStockValue = 0;
-		LOGGER.info("Request for Product List :: User - "+userid);
+		pBean.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
+		LOGGER.info("Request for Product List :: User - "+pBean.getUserID());
+		//Check for the requested category
 		if(request.getParameter("option")!=null && request.getParameter("option") !="")
 			{
 				category=Integer.parseInt(request.getParameter("option"));
-				LOGGER.debug("Requested Product Category - "+category+" :: User - "+userid);
-				totalStockValue=productDAO.getProductsDetails(userid,products,category);
+				LOGGER.debug("Requested Product Category - "+category+" :: User - "+pBean.getUserID());
+				totalStockValue=productDAO.getProductsDetails(pBean.getUserID(),products,category);
 				model.addAttribute("category",category);
 			}
 		else{
-			LOGGER.debug("Requested Product Category - All(-1) :: User - "+userid);
+			LOGGER.debug("Requested Product Category - All(-1) :: User - "+pBean.getUserID());
 			model.addAttribute("category",-1);
-			totalStockValue=productDAO.getProductsDetails(userid,products,-1);
+			totalStockValue=productDAO.getProductsDetails(pBean.getUserID(),products,-1);
 		}
-		
+		productDAO.getCategoryDetails(pBean.getUserID(), categories);
 		model.addAttribute("products",products);
 		model.addAttribute("totalStockValue",totalStockValue);
 		model.addAttribute("numberofproducts",products.size());
 		model.addAttribute("command",new ProductBean());
-	    productDAO.getCategoryDetails(userid, categories);
         model.addAttribute("categories",categories);
 		return "productlist";
 	}
 	
+	/**
+	 * Method to return price list based on the requested category
+	 * @param pBean
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("/productPriceList")
+	 public String getProductPriceList(@ModelAttribute("AccountmateWS")ProductBean pBean, 
+			   ModelMap model,HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		List<CategoryBean> categories = new ArrayList<CategoryBean>();
+		List<ProductBean> products = new ArrayList<ProductBean>();
+		int category =0;
+		// Check if session exists
+		if(session.getAttribute(AccountConstants.USER_NAME)== null){
+			return "home";
+		}
+		pBean.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
+		LOGGER.info("Request for Product Price List :: User - "+pBean.getUserID());
+		//Check for the requested category
+		if(request.getParameter("option")!=null && request.getParameter("option") !="")
+			{
+				category=Integer.parseInt(request.getParameter("option"));
+				LOGGER.debug("Requested Product Category - "+category+" :: User - "+pBean.getUserID());
+				productDAO.getProductsDetails(pBean.getUserID(),products,category);
+				model.addAttribute("category",category);
+			}
+		else{
+			LOGGER.debug("Requested Product Category - All(-1) :: User - "+pBean.getUserID());
+			model.addAttribute("category",-1);
+			productDAO.getProductsDetails(pBean.getUserID(),products,-1);
+		}
+		productDAO.getCategoryDetails(pBean.getUserID(), categories);
+		model.addAttribute("products",products);
+		model.addAttribute("command",new ProductBean());
+        model.addAttribute("categories",categories);
+		return "productpricelist";
+	}
+	
+	/**
+	 * Method to add a new product
+	 * @param product
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/addProduct")
 	public String addProduct(@ModelAttribute("AccountmateWS")ProductBean product,ModelMap model, HttpServletRequest request){
 		boolean flag=false;
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
 		HttpSession session = request.getSession();
-		if(session.getAttribute("userid")== null){
+		//Check if session exists
+		if(session.getAttribute(AccountConstants.USER_NAME)== null){
 			return "home";
 		}
-		LOGGER.info("Request to add a new product :: User - "+session.getAttribute("userid"));
+		product.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
+		LOGGER.info("Request to add a new product :: User - "+product.getUserID());
 		LOGGER.debug("Request Details - Product Category - "+product.getProductCategory()+" :: Product - "+product.getProductName()
 				+" :: Opening Balance - "+product.getOpeningBalance()+" :: Cost Price - "+product.getCostPrice()
 				+" :: Dealer Price - "+product.getDealerPrice()+" :: Market Price - "+product.getMarketPrice()
-				+" :: User - "+session.getAttribute("userid"));
-		product.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
+				+" :: User - "+product.getUserID());
+		
 		flag=productDAO.addProduct(product);
 		if(flag){
 			model.addAttribute("success","true");
@@ -102,65 +166,87 @@ public class ProductController {
 			model.addAttribute("success","false");
 			LOGGER.error("Failed to add a product ::User -"+product.getUserID());
 		}
+		productDAO.getCategoryDetails(product.getUserID(), categories);
 		model.addAttribute("command",new ProductBean());
-	    productDAO.getCategoryDetails(product.getUserID(), categories);
         model.addAttribute("categories",categories);
-        model.addAttribute("command",new ProductBean());
 		return "newproduct";
 	}
 	
+	/**
+	 * Method to get product quantity
+	 * @param productid
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(value = "/getProductQuantity", method = RequestMethod.GET)
 	public @ResponseBody String getProductQuantity(
 				@RequestParam("productid") String productid,HttpServletRequest request) {
 			HttpSession session = request.getSession();
-			if(session.getAttribute("userid")== null){
+			ProductBean product = new ProductBean();
+			//Check if session exists
+			if(session.getAttribute(AccountConstants.USER_NAME)== null){
 				return "home";
 			}
-			LOGGER.info("Request to get product quantity :: User - "+session.getAttribute("userid"));
-			ProductBean product = new ProductBean();
+			product.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
+			LOGGER.info("Request to get product quantity :: User - "+product.getUserID());
 			product.setProductID(Integer.parseInt(productid));
-			LOGGER.debug("Requested Product ID - "+product.getProductID()+" :: User - "+session.getAttribute("userid"));
-			product.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
+			LOGGER.debug("Requested Product ID - "+product.getProductID()+" :: User - "+product.getUserID());
 			productDAO.getProductBalance(product);
-			LOGGER.debug("User - "+session.getAttribute("userid")+" :: Product ID - "+product.getProductID()
+			LOGGER.debug("User - "+product.getUserID()+" :: Product ID - "+product.getProductID()
 					+" :: Product Balance - "+product.getProductBalance());
 			return String.valueOf(product.getProductBalance());
 		}
 	
+	/**
+	 * Method to get product DLP
+	 * @param productid
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(value = "/getProductDLP", method = RequestMethod.GET)
 	public @ResponseBody String getProductDLP(
 				@RequestParam("productid") String productid,HttpServletRequest request) {
 			HttpSession session = request.getSession();
-			if(session.getAttribute("userid")== null){
+			ProductBean product = new ProductBean();
+			//Check if session exists
+			if(session.getAttribute(AccountConstants.USER_NAME)== null){
 				return "home";
 			}
-			LOGGER.info("Request to get product DLP :: User - "+session.getAttribute("userid"));
-			ProductBean product = new ProductBean();
+			product.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
+			LOGGER.info("Request to get product DLP :: User - "+product.getUserID());
 			product.setProductID(Integer.parseInt(productid));
-			LOGGER.debug("Requested Product ID - "+product.getProductID()+" :: User - "+session.getAttribute("userid"));
-			product.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
+			LOGGER.debug("Requested Product ID - "+product.getProductID()+" :: User - "+product.getUserID());
 			productDAO.getProductDetails(product);
-			LOGGER.debug("User - "+session.getAttribute("userid")+" :: Product ID - "+product.getProductID()
+			LOGGER.debug("User - "+product.getUserID()+" :: Product ID - "+product.getProductID()
 					+" :: Product DLP - "+product.getDealerPrice());
 			return String.valueOf(product.getDealerPrice());
 		}
 	
+	/**
+	 * Method to get product stock transaction details for current month
+	 * @param pBean
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/stockRegister")
 	 public String getProductTransactions(@ModelAttribute("AccountmateWS")ProductBean pBean, 
 			   ModelMap model,HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		if(session.getAttribute("userid")== null){
+		List<TransactionBean> transactions = new ArrayList<TransactionBean>();
+		ProductBean product = new ProductBean();
+		Map<String,String> dates = new HashMap<String,String>();
+		//Check if session exists
+		if(session.getAttribute(AccountConstants.USER_NAME)== null){
 			return "home";
 		}
 		if(request.getParameter("productid")== null || request.getParameter("productid")==""){
 			return "home";
 		}
-		LOGGER.info("Request to get product transaction :: User - "+session.getAttribute("userid"));
-		List<TransactionBean> transactions = new ArrayList<TransactionBean>();
-		ProductBean product = new ProductBean();
-		Map<String,String> dates = new HashMap<String,String>();
+		product.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
+		LOGGER.info("Request to get product transaction :: User - "+product.getUserID());
 		product.setProductID(Integer.parseInt(request.getParameter("productid")));
-		product.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
+		//Get current month's start and end date
 		dates = Helper.getDateRange();
 		LOGGER.debug("Requested Product ID - "+product.getProductID()+" :: Start Date - "+dates.get("startdate")
 				+" :: End Date - "+dates.get("enddate")+" :: User - "+product.getUserID());
@@ -173,22 +259,30 @@ public class ProductController {
 
 	}
 	
+	/**
+	 * Method to get product stock transaction details between two dates 
+	 * @param pBean
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/getProductTransactionByDates")
 	public String getProductTransactionByDates(@ModelAttribute("AccountmateWS")ProductBean pBean, 
 			   ModelMap model,HttpServletRequest request){
 		HttpSession session = request.getSession();
-		if(session.getAttribute("userid")== null){
+		List<TransactionBean> transactions = new ArrayList<TransactionBean>();
+		ProductBean product = new ProductBean();
+		Map<String,String> dates = new HashMap<String,String>();
+		//Check if session exists
+		if(session.getAttribute(AccountConstants.USER_NAME)== null){
 			return "home";
 		}
 		if(request.getParameter("productid")== null || request.getParameter("productid")==""){
 			return "home";
 		}
-		LOGGER.info("Request to get product transaction :: User - "+session.getAttribute("userid"));
-		List<TransactionBean> transactions = new ArrayList<TransactionBean>();
-		ProductBean product = new ProductBean();
-		Map<String,String> dates = new HashMap<String,String>();
+		product.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
+		LOGGER.info("Request to get product transaction :: User - "+product.getUserID());
 		product.setProductID(Integer.parseInt(request.getParameter("productid")));
-		product.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
 		dates.put("startdate",request.getParameter("datefrom"));
 		dates.put("enddate", request.getParameter("dateto"));
 		LOGGER.debug("Requested Product ID - "+product.getProductID()+" :: Start Date - "+dates.get("startdate")
@@ -201,41 +295,60 @@ public class ProductController {
 		return "stockregister";	
 	}
 	
+	/**
+	 * Method to edit a product
+	 * @param productid
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	
 	@RequestMapping(value = "/editProduct", method = RequestMethod.GET)
 	public ModelAndView editProduct(@RequestParam("productid") String productid,ModelMap model, HttpServletRequest request){
 		HttpSession session = request.getSession();
-		List<CategoryBean> categories = new ArrayList<CategoryBean>();
-		LOGGER.info("Request to edit product :: User - "+session.getAttribute("userid"));
 		ProductBean product = new ProductBean();
+		List<CategoryBean> categories = new ArrayList<CategoryBean>();
+		product.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
+		LOGGER.info("Request to edit product :: User - "+product.getUserID());
 		product.setProductID(Integer.parseInt(productid));
-		product.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
-		LOGGER.debug("Requested Product ID - "+product.getProductID()+" :: User - "+session.getAttribute("userid"));
+		LOGGER.debug("Requested Product ID - "+product.getProductID()+" :: User - "+product.getUserID());
 		productDAO.getProductDetails(product);
+		productDAO.getCategoryDetails(product.getUserID(), categories);
+		
 		model.addAttribute("product",product);
 		model.addAttribute("command",new ProductBean());
-		productDAO.getCategoryDetails(product.getUserID(), categories);
         model.addAttribute("categories",categories);
 		ModelAndView mav = new ModelAndView();
 		String viewName = "editproduct";
 		mav.setViewName(viewName);
 		return mav;		
 	}
-
+	
+	/**
+	 * Method to update a product
+	 * @param product
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/updateProduct")
 	public String updateProduct(@ModelAttribute("AccountmateWS")ProductBean product,ModelMap model, HttpServletRequest request){
 		boolean flag=false;
 		HttpSession session =request.getSession();
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
-		if(session.getAttribute("userid")== null){
+		int category = 0;
+		double totalStockValue = 0;
+		//Check if session exists
+		if(session.getAttribute(AccountConstants.USER_NAME)== null){
 			return "home";
 		}
-		LOGGER.info("Request to update product :: User - "+session.getAttribute("userid")+" :: Product ID - "+product.getProductID());
+		product.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
+		LOGGER.info("Request to update product :: User - "+product.getUserID()+" :: Product ID - "+product.getProductID());
 		LOGGER.debug("Request Details - Product ID - "+product.getProductID()+" :: Product Category - "+product.getProductCategory()
 				+" :: Product - "+product.getProductName()
 				+" :: Opening Balance - "+product.getOpeningBalance()+" :: Cost Price - "+product.getCostPrice()
 				+" :: Dealer Price - "+product.getDealerPrice()+" :: Market Price - "+product.getMarketPrice()
-				+" :: User - "+session.getAttribute("userid"));
-		product.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
+				+" :: User - "+product.getUserID());
 		flag=productDAO.updateProduct(product);
 		if(flag){
 			model.addAttribute("success","true");
@@ -248,31 +361,41 @@ public class ProductController {
 		}
 		
 		List<ProductBean> products = new ArrayList<ProductBean>();
-		int category=Integer.parseInt(request.getParameter("redirectcategoryedit"));
-		double totalStockValue = 0;
+		category=Integer.parseInt(request.getParameter("redirectcategoryedit"));
 		LOGGER.debug("Product Category - "+category+" :: User - "+product.getUserID());
 		totalStockValue=productDAO.getProductsDetails(product.getUserID(),products,category);
+		productDAO.getCategoryDetails(product.getUserID(), categories);
 		model.addAttribute("category",category);
 		model.addAttribute("products",products);
 		model.addAttribute("totalStockValue",totalStockValue);
 		model.addAttribute("numberofproducts",products.size());
 		model.addAttribute("command",new ProductBean());
-		productDAO.getCategoryDetails(product.getUserID(), categories);
         model.addAttribute("categories",categories);
 		return "productlist";
 	}
+	
+	/**
+	 * Method to delete a product
+	 * @param product
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	
 	@RequestMapping("/deleteProduct")
 	public String deleteProduct(@ModelAttribute("AccountmateWS")ProductBean product,ModelMap model,HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
-		if(session.getAttribute("userid")== null){
+		boolean flag=false;
+		List<ProductBean> products = new ArrayList<ProductBean>();
+		double totalStockValue = 0;
+		//Check if session exists
+		if(session.getAttribute(AccountConstants.USER_NAME)== null){
 			return "home";
 		}
+		product.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to delete a product :: Product ID - "+product.getProductID()
-				+" :: User - "+session.getAttribute("userid"));
-		product.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
-		boolean flag=false;
+				+" :: User - "+product.getUserID());
 		flag=productDAO.deleteProduct(product);
 		if(flag== true){
 			LOGGER.info("Product Deleted Successfully :: Product ID - "+product.getProductID()+" :: User - "+product.getUserID());
@@ -285,28 +408,32 @@ public class ProductController {
 			model.addAttribute("message","Failed to delete product. Please check with support team for assistance.");
 		}
 		
-		List<ProductBean> products = new ArrayList<ProductBean>();
-		double totalStockValue = 0;
 		LOGGER.debug("Product Category - "+product.getProductCategory()+" :: User - "+product.getUserID());
 		totalStockValue=productDAO.getProductsDetails(product.getUserID(),products,product.getProductCategory());
+		productDAO.getCategoryDetails(product.getUserID(), categories);
 		model.addAttribute("category",product.getProductCategory());
 		model.addAttribute("products",products);
 		model.addAttribute("totalStockValue",totalStockValue);
 		model.addAttribute("numberofproducts",products.size());
 		model.addAttribute("command",new ProductBean());
-		productDAO.getCategoryDetails(product.getUserID(), categories);
         model.addAttribute("categories",categories);
 		return "productlist";
 		
 	}
 	
+	/**
+	 * Method to redirect to product categories page
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/productCategories")
 	 public String getProductCategories(ModelMap model,HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		if(session.getAttribute("userid")== null){
+		if(session.getAttribute(AccountConstants.USER_NAME)== null){
 			return "home";
 		}
-		int userid=Integer.parseInt((String)session.getAttribute("userid"));
+		int userid=Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME));
 		LOGGER.info("Request for Product Category List :: User - "+userid);
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
 		double totalStockValue = 0;
@@ -317,16 +444,27 @@ public class ProductController {
 		return "productcategories";
 	}
 	
+	/**
+	 * Method to add a category
+	 * @param category
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+			
 	@RequestMapping("/addCategory")
 	public String addCategory(@ModelAttribute("AccountmateWS")CategoryBean category,ModelMap model, HttpServletRequest request){
 		boolean flag=false;
 		HttpSession session = request.getSession();
-		if(session.getAttribute("userid")== null){
+		List<CategoryBean> categories = new ArrayList<CategoryBean>();
+		double totalStockValue = 0;
+		//Check if session exists
+		if(session.getAttribute(AccountConstants.USER_NAME)== null){
 			return "home";
 		}
-		LOGGER.info("Request to add a new category :: User - "+session.getAttribute("userid"));
-		LOGGER.debug("Request Details - Category - "+category.getCategory()+" :: User - "+session.getAttribute("userid"));
-		category.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
+		category.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
+		LOGGER.info("Request to add a new category :: User - "+category.getUserID());
+		LOGGER.debug("Request Details - Category - "+category.getCategory()+" :: User - "+category.getUserID());
 		flag=productDAO.addCategory(category);
 		if(flag){
 			model.addAttribute("success","true");
@@ -337,8 +475,6 @@ public class ProductController {
 			LOGGER.error("Failed to add a category ::User -"+category.getUserID());
 			model.addAttribute("message","Failed to add category. Please check with support team for assistance.");
 		}
-		List<CategoryBean> categories = new ArrayList<CategoryBean>();
-		double totalStockValue = 0;
 		totalStockValue=productDAO.getCategoryDetails(category.getUserID(),categories);
 		model.addAttribute("categories",categories);
 		model.addAttribute("totalstockvalue",totalStockValue);
@@ -346,17 +482,28 @@ public class ProductController {
 		return "productcategories";
 	}
 	
+	/**
+	 * Method to update category details
+	 * @param category
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/updateCategory")
 	public String updateCategory(@ModelAttribute("AccountmateWS")CategoryBean category,ModelMap model, HttpServletRequest request){
 		boolean flag=false;
 		HttpSession session = request.getSession();
-		if(session.getAttribute("userid")== null){
+		List<CategoryBean> categories = new ArrayList<CategoryBean>();
+		double totalStockValue = 0;
+		//Check if session exists
+		if(session.getAttribute(AccountConstants.USER_NAME)== null){
 			return "home";
 		}
-		LOGGER.info("Request to update category :: User - "+session.getAttribute("userid"));
+		category.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
+		LOGGER.info("Request to update category :: User - "+category.getUserID());
 		LOGGER.debug("Request Details - Category ID - "+category.getCategoryID()+" :: Category - "+category.getCategory()
-				+" :: User - "+session.getAttribute("userid"));
-		category.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
+				+" :: User - "+category.getUserID());
+		
 		flag=productDAO.updateCategory(category);
 		if(flag){
 			model.addAttribute("success","true");
@@ -367,8 +514,7 @@ public class ProductController {
 			LOGGER.error("Failed to update category ::User -"+category.getUserID());
 			model.addAttribute("message","Failed to update category. Please check with support team for assistance.");
 		}
-		List<CategoryBean> categories = new ArrayList<CategoryBean>();
-		double totalStockValue = 0;
+		
 		totalStockValue=productDAO.getCategoryDetails(category.getUserID(),categories);
 		model.addAttribute("categories",categories);
 		model.addAttribute("totalstockvalue",totalStockValue);
@@ -376,16 +522,27 @@ public class ProductController {
 		return "productcategories";
 	}
 	
+	/**
+	 * Method to delete a category
+	 * @param category
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/deleteCategory")
 	public String deleteCategory(@ModelAttribute("AccountmateWS")CategoryBean category,ModelMap model, HttpServletRequest request){
 		boolean flag=false;
 		HttpSession session = request.getSession();
-		if(session.getAttribute("userid")== null){
+		List<CategoryBean> categories = new ArrayList<CategoryBean>();
+		double totalStockValue = 0;
+		//Check if session exists
+		if(session.getAttribute(AccountConstants.USER_NAME)== null){
 			return "home";
 		}
-		LOGGER.info("Request to delete category :: User - "+session.getAttribute("userid"));
-		LOGGER.debug("Request Details - Category ID - "+category.getCategoryID()+" :: User - "+session.getAttribute("userid"));
-		category.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
+		category.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
+		LOGGER.info("Request to delete category :: User - "+category.getUserID());
+		LOGGER.debug("Request Details - Category ID - "+category.getCategoryID()+" :: User - "+category.getUserID());
+		
 		flag=productDAO.deleteCategory(category);
 		if(flag){
 			model.addAttribute("success","true");
@@ -396,8 +553,7 @@ public class ProductController {
 			LOGGER.error("Failed to delete category ::User -"+category.getUserID());
 			model.addAttribute("message","Failed to delete category. Please check with support team for assistance.");
 		}
-		List<CategoryBean> categories = new ArrayList<CategoryBean>();
-		double totalStockValue = 0;
+		
 		totalStockValue=productDAO.getCategoryDetails(category.getUserID(),categories);
 		model.addAttribute("categories",categories);
 		model.addAttribute("totalstockvalue",totalStockValue);

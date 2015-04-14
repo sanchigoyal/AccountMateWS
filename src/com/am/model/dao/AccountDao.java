@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import com.am.connection.Connect;
-import com.am.model.bean.ProductBean;
 import com.am.model.bean.UserBean;
 
 public class AccountDao {

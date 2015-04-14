@@ -14,13 +14,9 @@ import org.apache.log4j.Logger;
 
 import com.am.connection.Connect;
 import com.am.constants.ExpenseConstants;
-import com.am.constants.InvoiceConstants;
 import com.am.model.bean.CategoryBean;
 import com.am.model.bean.ExpenseBean;
 import com.am.model.bean.ExpenseBeanList;
-import com.am.model.bean.InvoiceBean;
-import com.am.model.bean.ItemBean;
-
 
 public class ExpenseDAOImpl implements ExpenseDAO {
 	static Logger LOGGER = Logger.getLogger(ExpenseDAOImpl.class.getName());

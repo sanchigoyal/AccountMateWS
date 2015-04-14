@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 
 import com.am.connection.Connect;
 import com.am.model.bean.InvoiceBean;
-import com.am.model.bean.PaymentBean;
 import com.am.model.bean.ReceiptBean;
 
 public class ReceiptDAOImpl implements ReceiptDAO {

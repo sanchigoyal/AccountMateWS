@@ -39,6 +39,7 @@
 					<li><a href="/AccountmateWS/productList">Product List</a></li>
 					<li><a href="/AccountmateWS/newProduct">New Product</a></li>
 					<li><a href="/AccountmateWS/productCategories">Product Categories</a></li>
+					<li><a href="/AccountmateWS/productPriceList">Price List</a></li>
 				</ul>
 			</li>
 			<li><a href="/AccountmateWS/reports">Reports</a></li>
