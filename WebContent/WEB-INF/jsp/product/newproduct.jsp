@@ -3,7 +3,7 @@
 <%@ page import="java.io.*,java.util.*,java.sql.*"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -12,41 +12,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-
     <title>Accountmate v1.2</title>
-
-    <!-- Bootstrap core CSS -->
-    <link href="resources/css/bootstrap.min.css" rel="stylesheet">
-    <link href="resources/css/font-awesome.min.css" rel="stylesheet">
-	<link href="resources/css/style.css" rel="stylesheet">
-	<link href="resources/css/bootstrapValidator.css" rel="stylesheet">
-	<link href="resources/css/bootstrap-formhelpers.min.css" rel="stylesheet">
-
-
   </head>
 
   <body>
-
-    <%
-		//allow access only if session exists
-		String userid = null;
-		String login = null;
-		if(session.getAttribute("userid") == null){
-		    response.sendRedirect("/AccountmateWS/start");
-		}else {
-				userid = (String) session.getAttribute("userid");
-				login = (String) session.getAttribute("login");
-		}
-	%>
-	
     <!-- Header -->
-    <%@include file="header.jsp" %>
+    <%@include file="../headernew.jsp" %>
 	<!-- -- --- -->
 	
 	<div class="container">
 		<div class="row">
 			<div class="col-md-8">
-				<h2>Add a new product</h2><hr/>
+				<h2>Add product</h2><hr/>
 				<div id="success">
 		            <div class="alert alert-success">
 		              <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -61,7 +38,7 @@
 		        </div>
 				<form:form class="form-horizontal" id="productForm" action="/AccountmateWS/addProduct" method="post">
 					<div class="form-group">
-						<label for="name" class="col-md-3">Product Category</label>
+						<label class="col-md-3 control-label">Product Category</label>
 						<div class="col-md-4">
 							<select id="productcategory" name="productCategory" class="form-control">
 							<c:forEach var="category" items="${categories}">
@@ -70,39 +47,48 @@
 							</select>
 						</div>
 					</div>
-					<div class="form-group">
-						<label for="productname" class="col-md-3">Product Name</label>
+					<div class="form-group required">
+						<label class="col-md-3 control-label">Product Name</label>
 						<div class="col-md-8">
 							<input id="productname" name="productName" type="text" class="form-control" placeholder="Enter Product Name..."/>
 						</div>
 					</div>
-					<div class="form-group">
-						<label for="openingbalance" class="col-md-3">Opening Balance (units)</label>
+					<div class="form-group required">
+						<label class="col-md-3 control-label">Opening Balance (units)</label>
 						<div class="col-md-8">
 							<input id="openingbalance" name="openingBalance" type="text" class="form-control" placeholder="Enter Opening Balance... ">
 						</div>
 					</div>
-					<div class="form-group">
-						<label for="costprice" class="col-md-3">Curr. Cost Price (<i class="fa fa-rupee extraPaddingLeftRight5"></i>)</label>
+					<div class="form-group required">
+						<label class="col-md-3 control-label">Curr. Cost Price</label>
 						<div class="col-md-8">
-							<input onblur="convertDecimal('costprice');" id="costprice" name="costPrice" type="text" class="form-control" placeholder="Enter Curr. Cost Price... ">
+							<div class="input-group">
+				                <div class="input-group-addon"><i class="fa fa-rupee extraPaddingLeftRight5"></i></div>
+				                <input id="costprice" name="costPrice" type="text" class="form-control" placeholder="Enter Curr. Cost Price... ">
+				            </div>
+						</div>
+					</div>
+					<div class="form-group required">
+						<label class="col-md-3 control-label">Curr. DLP</label>
+						<div class="col-md-8">
+							<div class="input-group">
+				                <div class="input-group-addon"><i class="fa fa-rupee extraPaddingLeftRight5"></i></div>
+				                <input id="dealerprice" name="dealerPrice" type="text" class="form-control" placeholder="Enter Curr. DLP... ">
+				            </div>
+						</div>
+					</div>
+					<div class="form-group required">
+						<label class="col-md-3 control-label">Curr. MRP (<i class="fa fa-rupee extraPaddingLeftRight5"></i>)</label>
+						<div class="col-md-8">
+							<div class="input-group">
+				                <div class="input-group-addon"><i class="fa fa-rupee extraPaddingLeftRight5"></i></div>
+				                <input id="marketprice" name="marketPrice" type="text" class="form-control" placeholder="Enter Curr. MRP... ">
+				            </div>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="dealerprice" class="col-md-3">Curr. DLP (<i class="fa fa-rupee extraPaddingLeftRight5"></i>)</label>
-						<div class="col-md-8">
-							<input onblur="convertDecimal('dealerprice');" id="dealerprice" name="dealerPrice" type="text" class="form-control" placeholder="Enter Curr. DLP... ">
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="marketprice" class="col-md-3">Curr. MRP (<i class="fa fa-rupee extraPaddingLeftRight5"></i>)</label>
-						<div class="col-md-8">
-							<input onblur="convertDecimal('marketprice');" id="marketprice" name="marketPrice" type="text" class="form-control" placeholder="Enter Curr. MRP... ">
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="col-md-10 col-md-offset-3">
-							<button type="submit" class="btn btn-primary">Add this product</button>
+						<div class="col-md-8 col-md-offset-3">
+							<button type="submit" class="btn btn-primary">Save</button>
 							<button type="reset" class="btn btn-default">Clear</button>
 						</div>
 					</div>
@@ -143,14 +129,9 @@
 	</div>
 
 	<!-- Footer -->
-    <%@include file="footer.jsp" %>
-	<!-- -- --- -->
+    <%@include file="../footernew.jsp" %>
 	
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-	<script src="resources/js/jquery.js"></script>
-    <script src="resources/js/bootstrap.min.js"></script>
-    <script src="resources/js/bootstrapValidator.js"></script>
-    <script src="resources/js/bootstrap-formhelpers.min.js"></script>
+	<!--Block of code to display success or failure message --- -->
     <script>
 		if("${success}" == "true")
 		{
@@ -166,20 +147,8 @@
 			document.getElementById("failure").style.display = "none";
 		}
 	</script>
-	<script type="text/javascript">
-    $(window).load(function(){
-    	if('<%=login%>' == "success")
-    	{
-    		document.getElementById("leftnav").style.display= "block";
-    		document.getElementById("logoutnav").style.display="block";
-    	}
-    	else{
-    		document.getElementById("leftnav").style.display= "none";
-    		document.getElementById("logoutnav").style.display="none";
-    	}
-        
-    });	
-	</script>
+	
+	<!-- Bootstrap Validation Logic -->
 	<script>
 	$(document).ready(function() {
     $('#productForm').bootstrapValidator({
@@ -202,14 +171,17 @@
                         message: 'The product name must be more than 3 and less than 30 characters long'
                     },
                     regexp: {
-                        regexp: /^[a-z A-Z0-9]+$/,
-                        message: 'The product name can consist of alphabets and numbers'
+                        regexp: /^[a-z A-Z0-9_]+$/,
+                        message: 'The product name can consist of alphabetical, number and underscore'
                     }
                 }
             },
             openingBalance: {
                 message: 'The opening balance is not valid',
                 validators: {
+                	notEmpty: {
+                        message: 'The opening balance is required'
+                    },
                     regexp: {
                     	regexp: /^[0-9]+$/,
                         message: 'The opening balance can only consist of numbers'
@@ -219,27 +191,33 @@
             costPrice: {
                 message: 'The cost price is not valid',
                 validators: {
-                    regexp: {
-                    	regexp: /^[0-9.]+$/,
-                        message: 'The cost price can consist of numbers and point(.)'
+                    notEmpty: {
+                        message: 'The cost price is required'
+                    },
+                    numeric: {
+                        message: 'The cost price must be a number'
                     }
                 }
             },
             marketPrice: {
                 message: 'The MRP is not valid',
                 validators: {
-                    regexp: {
-                    	regexp: /^[0-9.]+$/,
-                        message: 'The MRP can consist of numbers and point(.)'
+                    notEmpty: {
+                        message: 'The market price is required'
+                    },
+                    numeric: {
+                        message: 'The market price must be a number'
                     }
                 }
             },
             dealerPrice: {
                 message: 'The DLP is not valid',
                 validators: {
-                    regexp: {
-                    	regexp: /^[0-9.]+$/,
-                        message: 'The DLP can consist of numbers and point(.)'
+                    notEmpty: {
+                        message: 'The dealer price is required'
+                    },
+                    numeric: {
+                        message: 'The dealer price must be a number'
                     }
                 }
             }
@@ -248,30 +226,5 @@
     });
 });
 </script>
-<script>
-function number_format(num)
-{
-	num="" + Math.floor(num*100.0 + 0.5)/100.0;
-	var i=num.indexOf(".");
-	if(num=="NaN"){
-		num="00.00";
-	}
-	else if (i<0 ) 
-		num+=".00";
-	else {
-		num=num.substring(0,i) + "." + num.substring(i + 1);
-		var nDec=(num.length - i) - 1;
-		if ( nDec==0 ) num+="00";
-		else if ( nDec==1 ) num+="0";
-		else if ( nDec>2 ) num=num.substring(0,i + 3);
-		}
-	return num;
-}
-	function convertDecimal(ele){
-		var price = $('#'+ele).val();
-		var temp=parseFloat(price);
-		$('#'+ele).val(number_format(temp));
-	}
-</script>
-  </body>
+</body>
 </html>

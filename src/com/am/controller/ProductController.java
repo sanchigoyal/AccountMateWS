@@ -21,6 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.am.helper.Helper;
 import com.am.model.bean.CategoryBean;
 import com.am.model.bean.ProductBean;
+import com.am.model.bean.ProductsBean;
 import com.am.model.bean.TransactionBean;
 import com.am.model.dao.ProductDAO;
 import com.am.model.dao.ProductDAOImpl;
@@ -49,7 +50,7 @@ public class ProductController {
 		  productDAO.getCategoryDetails(userid, categories);
 	      model.addAttribute("categories",categories);
 	      model.addAttribute("command",new ProductBean());
-	      return "newproduct";
+	      return "product/newproduct";
 	   }
 	
 	/**
@@ -92,7 +93,7 @@ public class ProductController {
 		model.addAttribute("numberofproducts",products.size());
 		model.addAttribute("command",new ProductBean());
         model.addAttribute("categories",categories);
-		return "productlist";
+		return "product/productlist";
 	}
 	
 	/**
@@ -169,7 +170,7 @@ public class ProductController {
 		productDAO.getCategoryDetails(product.getUserID(), categories);
 		model.addAttribute("command",new ProductBean());
         model.addAttribute("categories",categories);
-		return "newproduct";
+		return "product/newproduct";
 	}
 	
 	/**
@@ -255,7 +256,7 @@ public class ProductController {
 		model.addAttribute("transactions",transactions);
 		model.addAttribute("startdate",dates.get("startdate"));
 		model.addAttribute("enddate",dates.get("enddate"));
-		return "stockregister";
+		return "product/stockregister";
 
 	}
 	
@@ -292,7 +293,7 @@ public class ProductController {
 		model.addAttribute("transactions",transactions);
 		model.addAttribute("startdate",dates.get("startdate"));
 		model.addAttribute("enddate",dates.get("enddate"));
-		return "stockregister";	
+		return "product/stockregister";	
 	}
 	
 	/**
@@ -319,7 +320,7 @@ public class ProductController {
 		model.addAttribute("command",new ProductBean());
         model.addAttribute("categories",categories);
 		ModelAndView mav = new ModelAndView();
-		String viewName = "editproduct";
+		String viewName = "product/editproduct";
 		mav.setViewName(viewName);
 		return mav;		
 	}
@@ -371,7 +372,7 @@ public class ProductController {
 		model.addAttribute("numberofproducts",products.size());
 		model.addAttribute("command",new ProductBean());
         model.addAttribute("categories",categories);
-		return "productlist";
+		return "product/productlist";
 	}
 	
 	/**
@@ -417,7 +418,7 @@ public class ProductController {
 		model.addAttribute("numberofproducts",products.size());
 		model.addAttribute("command",new ProductBean());
         model.addAttribute("categories",categories);
-		return "productlist";
+		return "product/productlist";
 		
 	}
 	
@@ -559,5 +560,62 @@ public class ProductController {
 		model.addAttribute("totalstockvalue",totalStockValue);
 		model.addAttribute("command",new CategoryBean());
 		return "productcategories";
+	}
+	
+	/**
+	 * Method to update product price list
+	 * @param productList
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("/updateProductPrice")
+	public String updateProductPrice(@ModelAttribute("AccountmateWS")ProductsBean productList,ModelMap model, HttpServletRequest request){
+		boolean flag=false;
+		HttpSession session =request.getSession();
+		List<CategoryBean> categories = new ArrayList<CategoryBean>();
+		List<ProductBean> products = new ArrayList<ProductBean>();
+		int category =0;
+		//Check if session exists
+		if(session.getAttribute(AccountConstants.USER_NAME)== null){
+			return "home";
+		}
+		productList.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
+		LOGGER.info("Request to update product list :: User - "+productList.getUserID());
+		filterProductList(productList);
+		flag=productDAO.updateProductPrice(productList);
+		if(flag){
+			model.addAttribute("success","true");
+			model.addAttribute("message","Product Price Update Successfully.");
+			LOGGER.info("Product Price Updated Successfully :: User - "+productList.getUserID());
+		}else{
+			model.addAttribute("success","false");
+			model.addAttribute("message","Failed to update product price. Please check with support team for assistance.");
+			LOGGER.error("Failed to update product price :: User - "+productList.getUserID());
+		}
+		
+		category = productList.getProductsCategory();
+		LOGGER.debug("Requested Product Category - "+category+" :: User - "+productList.getUserID());
+		productDAO.getProductsDetails(productList.getUserID(),products,category);
+		model.addAttribute("category",category);
+		productDAO.getCategoryDetails(productList.getUserID(), categories);
+		model.addAttribute("products",products);
+		model.addAttribute("command",new ProductBean());
+        model.addAttribute("categories",categories);
+		return "productpricelist";
+	}
+	
+	/**
+	 * Method to filter unwanted data in the request list
+	 * @param products
+	 */
+	private void filterProductList(ProductsBean products){
+		List<ProductBean> filteredProducts = new ArrayList<ProductBean>();
+		for(ProductBean product : products.getProducts()){
+			if(product.getProductID() != 0){
+				filteredProducts.add(product);
+			}	
+		}
+		products.setProducts(filteredProducts);
 	}
 }

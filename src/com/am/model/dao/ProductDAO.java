@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.am.model.bean.CategoryBean;
 import com.am.model.bean.ProductBean;
+import com.am.model.bean.ProductsBean;
 import com.am.model.bean.TransactionBean;
 
 public interface ProductDAO {
@@ -19,4 +20,5 @@ public interface ProductDAO {
 	public boolean deleteCategory(CategoryBean category);
 	public boolean updateCategory(CategoryBean category);
 	public boolean addCategory(CategoryBean category);
+	public boolean updateProductPrice(ProductsBean products);
 }

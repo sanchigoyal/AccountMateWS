@@ -434,4 +434,50 @@ where
 END//
 DELIMITER ;
 
+#Proc to update product price
+DELIMITER //
+CREATE PROCEDURE updateProductPrice(
+		 IN productID INT,
+		 IN costPrice DECIMAL(8,2),
+		 IN dealerPrice DECIMAL(8,2),
+		 IN marketPrice DECIMAL(8,2)
+         )
+BEGIN
+DECLARE actionID INT DEFAULT 0;		
+call generateActionID('Update Product Price',actionID);
+
+if costPrice != 0 then
+	UPDATE price 
+	SET 
+		close_action_id = actionID
+	WHERE
+		product_id = productID
+			AND price_type = 1
+			AND close_action_id is null;
+	INSERT into price values(null,productID,1,costPrice,null,actionID);
+end if;
+
+if dealerPrice != 0 then
+	UPDATE price 
+	SET 
+		close_action_id = actionID
+	WHERE
+		product_id = productID
+			AND price_type = 4
+			AND close_action_id is null;
+	INSERT into price values(null,productID,4,dealerPrice,null,actionID);
+end if;
+
+if marketPrice != 0 then
+	UPDATE price 
+	SET 
+		close_action_id = actionID
+	WHERE
+		product_id = productID
+			AND price_type = 3
+			AND close_action_id is null;
+	INSERT into price values(null,productID,3,marketPrice,null,actionID);
+end if;
+END//
+DELIMITER ;
 

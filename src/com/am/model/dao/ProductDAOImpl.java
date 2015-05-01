@@ -13,6 +13,7 @@ import com.am.connection.Connect;
 import com.am.constants.ProductConstants;
 import com.am.model.bean.CategoryBean;
 import com.am.model.bean.ProductBean;
+import com.am.model.bean.ProductsBean;
 import com.am.model.bean.TransactionBean;
 
 public class ProductDAOImpl implements ProductDAO {
@@ -262,6 +263,42 @@ public class ProductDAOImpl implements ProductDAO {
 		        flag=true; 
 		    } catch (SQLException se) {
 		        LOGGER.error(se.getMessage(),se);
+		    }
+		    finally {
+		    	Connect.dropCallableObject(cs);
+				Connect.dropConnection(con);
+		    }
+			return flag;
+		}
+		
+		
+		public boolean updateProductPrice(ProductsBean products){ 	
+			Connection con=null;
+			CallableStatement cs =null;
+			boolean flag=false;
+			try {
+				con=Connect.doConnection();
+				con.setAutoCommit(false);
+				for(ProductBean product :products.getProducts()){
+			        cs = con.prepareCall(ProductConstants.UPDATE_PRODUCT_PRICE);
+			        cs.setInt(1, product.getProductID());
+			        cs.setDouble(2, product.getCostPrice());
+			        cs.setDouble(3, product.getDealerPrice());
+			        cs.setDouble(4, product.getMarketPrice());
+			        cs.execute();
+				}
+		        flag=true; 
+		        con.commit();
+		    } catch (SQLException se) {
+		        LOGGER.error(se.getMessage(),se);
+		        if (con != null) {
+		            try {
+		                con.rollback();
+		                LOGGER.error("Rollbacking Current Transaction :: User - "+products.getUserID());
+		            } catch (SQLException seInner) {
+		                LOGGER.error(seInner.getMessage(),seInner);
+		            }
+		        }
 		    }
 		    finally {
 		    	Connect.dropCallableObject(cs);

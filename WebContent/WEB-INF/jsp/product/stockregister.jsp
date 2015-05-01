@@ -10,35 +10,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-
     <title>Accountmate v1.2</title>
-
-    <!-- Bootstrap core CSS -->
-    <link href="resources/css/bootstrap.min.css" rel="stylesheet">
-    <link href="resources/css/font-awesome.min.css" rel="stylesheet">
-	<link href="resources/css/style.css" rel="stylesheet">
-	<link href="resources/css/bootstrapValidator.css" rel="stylesheet">
-	<link href="resources/css/bootstrap-formhelpers.min.css" rel="stylesheet">
-	<link href="resources/css/datepicker.css" rel="stylesheet">
-	<link href="resources/css/dataTables.bootstrap.css" rel="stylesheet">
-
   </head>
 
   <body>
-
-    <%
-		//allow access only if session exists
-		String userid = null;
-		String login = null;
-		if(session.getAttribute("userid") == null){
-		    response.sendRedirect("/AccountmateWS/start");
-		}else {
-				userid = (String) session.getAttribute("userid");
-				login = (String) session.getAttribute("login");
-		}
-	%>
     <!-- Header -->
-    <%@include file="header.jsp" %>
+    <%@include file="../headernew.jsp" %>
 	<!-- -- --- -->
 	
 	<div class="container">
@@ -100,7 +77,7 @@
 		<div class="modal fade" id="viewInvoice" tabinex="-1" role="dialog" aria-hidden="true">
 			<div class="modal-dialog large">
 				<div id="invoice-content" class="modal-content">
-						<%@include file="invoice.jsp" %>
+						<%@include file="../invoice.jsp" %>
 				</div>
 			</div>
 		</div>
@@ -108,17 +85,8 @@
 	
 
 	<!-- Footer -->
-    <%@include file="footer.jsp" %>
+    <%@include file="../footernew.jsp" %>
 	<!-- -- --- -->
-	
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-	<script src="resources/js/jquery.js"></script>
-    <script src="resources/js/bootstrap.min.js"></script>
-    <script src="resources/js/bootstrapValidator.js"></script>
-    <script src="resources/js/bootstrap-formhelpers.min.js"></script>
-    <script src="resources/js/bootstrap-datepicker.js"></script>
-    <script src="resources/js/jquery.dataTables.min.js"></script>
-    <script src="resources/js/dataTables.bootstrap.js"></script>
 	<script>
 		$(document).ready(function() {
 		    $('#transaction').dataTable();
@@ -128,19 +96,6 @@
 		});
 	</script>
 	<script type="text/javascript">
-    $(window).load(function(){
-    	if('<%=login%>' == "success")
-    	{
-    		document.getElementById("leftnav").style.display= "block";
-    		document.getElementById("logoutnav").style.display="block";
-    	}
-    	else{
-    		document.getElementById("leftnav").style.display= "none";
-    		document.getElementById("logoutnav").style.display="none";
-    	}
-        
-    });	
-    
     function updateInvoiceModal(invoiceid){
 		var data = 'invoiceid='
 			+ encodeURIComponent(invoiceid);

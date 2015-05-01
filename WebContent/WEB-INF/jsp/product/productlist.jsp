@@ -12,33 +12,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-
     <title>Accountmate v1.2</title>
-
-    <!-- Bootstrap core CSS -->
-    <link href="resources/css/bootstrap.min.css" rel="stylesheet">
-    <link href="resources/css/font-awesome.min.css" rel="stylesheet">
-	<link href="resources/css/style.css" rel="stylesheet">
-	<link href="resources/css/bootstrapValidator.css" rel="stylesheet">
-	<link href="resources/css/bootstrap-formhelpers.min.css" rel="stylesheet">
-
-
   </head>
 
   <body>
-  	<%
-		//allow access only if session exists
-		String userid = null;
-		String login = null;
-		if(session.getAttribute("userid") == null){
-		    response.sendRedirect("/AccountmateWS/start");
-		}else {
-				userid = (String) session.getAttribute("userid");
-				login = (String) session.getAttribute("login");
-		}
-	%>
 	<script>
-		function toggleOptional (obj, id ) {
+	   function toggleOptional (obj, id ) {
 			if ($("#" + id ).css("display") == 'none' ) {
 		    	$("#" + id).show("normal");
 				obj.innerHTML = '<i class="fa fa-minus-square extraPaddingRight20"></i>';
@@ -102,7 +81,7 @@
 	</script>
     
     <!-- Header -->
-    <%@include file="header.jsp" %>
+    <%@include file="../headernew.jsp" %>
 	<!-- -- --- -->
 	
 	<!--Client list
@@ -176,7 +155,7 @@
 					<td class="text-right"><i class="fa fa-rupee extraPaddingLeftRight5"></i>${product.stockValue}</td>
 					<td class="text-center"><p><a href="/AccountmateWS/stockRegister?productid=${product.productID}" class="addLineSeperator" data-toggle="tooltip" data-placement="bottom" title="Stock Register"><i class="fa fa-book fa-lg extraPaddingLeftRight5"></i></a>
 					<a data-toggle="modal" href="#editProduct" class="addLineSeperator" onClick="updateEditModal('${product.productID}');" title="Edit"><i class="fa fa-edit fa-lg extraPaddingLeftRight5"></i></a>
-					<a data-toggle="modal" href="#productDelete" onclick="updateDeleteModal('${product.productName}','${product.productID}','${product.productBalance}');"><i class="fa fa-trash fa-lg extraPaddingLeftRight5"></i></a></p></td>
+					<a data-toggle="modal" href="#productDelete" title="delete" onclick="updateDeleteModal('${product.productName}','${product.productID}','${product.productBalance}');"><i class="fa fa-trash fa-lg extraPaddingLeftRight5"></i></a></p></td>
 				</tr>
 				<tr id="childrow${product.productID}">
 					<td colspan="7" style="padding: 0; border: none;">
@@ -219,49 +198,42 @@
 			</tbody>
 		</table>
 				
-				<!----Delete Product Modal--->
-				<div class="modal fade" id="productDelete" tabinex="-1" role="dialog" aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content">
-								<div class="modal-header">
-									<h2>Are you sure ?</h2>
-								</div>
-								<div class="modal-body">
-									<p>Deleting the product will not remove its sales/purchase entries as they are used for your records, and any
-								product with non-zero availability will not be deleted.</p>
-									<p id="confirmquestion">Are you sure you want to delete <label id="productName"></label> ?</p>
-								</div>
-								<div class="modal-footer">
-									<form:form class="form-inline" id="productdeleteform" method="post" action="/AccountmateWS/deleteProduct">
-										<input type="hidden" id="deleteproductid" name="productID" value = ""/>
-										<input type="hidden" id="redirectcategory" name="productCategory" value = ""/>
-										<button id="deletebutton" type="submit" class="btn btn-danger">Delete</button>
-										<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-									</form:form>
-								</div>
+		<!----Delete Product Modal--->
+		<div class="modal fade" id="productDelete" tabinex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+						<div class="modal-header">
+							<h2>Are you sure ?</h2>
 						</div>
-					</div>
-				</div>
-				<!-- Edit Product Modal -->
-				<div class="modal fade" id="editProduct" tabinex="-1" role="dialog" aria-hidden="true">
-					<div class="modal-dialog">
-						<div id="product-content" class="modal-content">
-								<%@include file="editproduct.jsp" %>
+						<div class="modal-body">
+							<p>Deleting the product will not remove its sales/purchase entries as they are used for your records, and any
+						product with non-zero availability will not be deleted.</p>
+							<p id="confirmquestion">Are you sure you want to delete <label id="productName"></label> ?</p>
 						</div>
-					</div>
+						<div class="modal-footer">
+							<form:form class="form-inline" id="productdeleteform" method="post" action="/AccountmateWS/deleteProduct">
+								<input type="hidden" id="deleteproductid" name="productID" value = ""/>
+								<input type="hidden" id="redirectcategory" name="productCategory" value = ""/>
+								<button id="deletebutton" type="submit" class="btn btn-danger">Delete</button>
+								<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+							</form:form>
+						</div>
 				</div>
+			</div>
+		</div>
+		<!-- Edit Product Modal -->
+		<div class="modal fade" id="editProduct" tabinex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div id="product-content" class="modal-content">
+						<%@include file="editproduct.jsp" %>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<!-- Footer -->
-    <%@include file="footer.jsp" %>
+    <%@include file="../footernew.jsp" %>
 	<!-- -- --- -->
-	
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-	<script src="resources/js/jquery.js"></script>
-    <script src="resources/js/bootstrap.min.js"></script>
-    <script src="resources/js/bootstrapValidator.js"></script>
-    <script src="resources/js/bootstrap-formhelpers.min.js"></script>
-    
     <script>
 		if("${success}" == "true")
 		{
@@ -288,18 +260,6 @@
 	$(function () {
 		  $('[data-toggle="tooltip"]').tooltip();
 		});
-    $(window).load(function(){
-    	if('<%=login%>' == "success")
-    	{
-    		document.getElementById("leftnav").style.display= "block";
-    		document.getElementById("logoutnav").style.display="block";
-    	}
-    	else{
-    		document.getElementById("leftnav").style.display= "none";
-    		document.getElementById("logoutnav").style.display="none";
-    	}
-        
-    });	
     function updateProducts(option){
 		document.location.href="/AccountmateWS/productList?option="+option.value;   
 	}

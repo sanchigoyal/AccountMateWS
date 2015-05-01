@@ -125,11 +125,15 @@
 			</div>
 			<div class="col-md-3">
 				<div class="well">
-					<table id="changeTable">
-						<tr><th>Changes..</th></tr>
-					</table>
-					<br/>
-					<input type="submit" class="btn btn-success" value="Save Changes">
+					<input type="hidden" name="counter" id="counter" value="0" /> 
+					<form:form id="changeForm" action="/AccountmateWS/updateProductPrice" method="post">
+						<table id="changeTable">
+							<tr><th>Changes..</th></tr>
+						</table>
+						<br/>
+						<input type="hidden" id="redirectcategory" name="productsCategory" value = "${category}"/>
+						<input type="submit" id="submitChanges" class="btn btn-success" value="Save Changes" disabled>
+					</form:form>
 				</div>
 			</div>
 		</div>
@@ -171,7 +175,7 @@
 	<script type="text/javascript">
 	var options= document.getElementById('productCategory').options;
 	for (var i= 0, n= options.length; i<n; i++) {
-	    if (options[i].value==='${category}') {
+	    if (options[i].value=='${category}') {
 	        options[i].selected= true;
 	        break;
 	    }
@@ -213,49 +217,55 @@
             	//if already exists , remove and add
             	
             	if($('#changeRow'+productid).length){
+            		var counter = $('#changeRow'+productid).attr("data-counter");
             		if($(this).hasClass("cp")){
             			//if already exist remove and add
             			//or else add
             			if($('#cp'+productid).length){
-            				$('#cp'+productid).html('CP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span>');
+            				$('#cp'+productid).html('CP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span><input type="hidden" name="products['+counter+'].costPrice" value="'+$(this).val()+'">');
             			}
             			else{
-            				$('#changeRow'+productid+' td ul').append('<li id="cp'+productid+'">CP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span></li>');
+            				$('#changeRow'+productid+' td ul').append('<li id="cp'+productid+'">CP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span><input type="hidden" name="products['+counter+'].costPrice" value="'+$(this).val()+'"></li>');
             			}
                 	}
                 	else if($(this).hasClass("dp")){
                 		//if already exist remove and add
                 		//or else add
                 		if($('#dp'+productid).length){
-            				$('#dp'+productid).html('DP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span>');
+            				$('#dp'+productid).html('DP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span><input type="hidden" name="products['+counter+'].dealerPrice" value="'+$(this).val()+'">');
             			}
             			else{
-            				$('#changeRow'+productid+' td ul').append('<li id="dp'+productid+'">DP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span></li>');
+            				$('#changeRow'+productid+' td ul').append('<li id="dp'+productid+'">DP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span><input type="hidden" name="products['+counter+'].dealerPrice" value="'+$(this).val()+'"></li>');
             			}
                 	}
                 	else{
                 		//if already exist remove and add
                 		//or else add
                 		if($('#mrp'+productid).length){
-            				$('#mrp'+productid).html('MRP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span>');
+            				$('#mrp'+productid).html('MRP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span><input type="hidden" name="products['+counter+'].marketPrice" value="'+$(this).val()+'">');
             			}
             			else{
-            				$('#changeRow'+productid+' td ul').append('<li id="mrp'+productid+'">MRP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span></li>');
+            				$('#changeRow'+productid+' td ul').append('<li id="mrp'+productid+'">MRP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span><input type="hidden" name="products['+counter+'].marketPrice" value="'+$(this).val()+'"></li>');
             			}
                 	}	
             	}
             	else{
+            		
+            		//if no entry exists . Create a fresh one.
             		var rowHTML="";
+            		var counter =parseInt($('#counter').val())+1;
             		if($(this).hasClass("cp")){
-            			rowHTML = '<tr id="changeRow'+productid+'"><td><h5><strong>'+productName+'</strong></h5><p><ul><li id="cp'+productid+'">CP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span></li></ul></p></td></tr>';
+            			rowHTML = '<tr id="changeRow'+productid+'" data-counter="'+counter+'"><td><input type="hidden" name="products['+counter+'].productID" value="'+productid+'"><h5><strong>'+productName+'</strong></h5><p><ul><li id="cp'+productid+'">CP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span><input type="hidden" name="products['+counter+'].costPrice" value="'+$(this).val()+'"></li></ul></p></td></tr>';
                 	}
                 	else if($(this).hasClass("dp")){
-                		rowHTML = '<tr id="changeRow'+productid+'"><td><h5><strong>'+productName+'</strong></h5><p><ul><li id="dp'+productid+'">DP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span></li></ul></p></td></tr>';
+                		rowHTML = '<tr id="changeRow'+productid+'" data-counter="'+counter+'"><td><input type="hidden" name="products['+counter+'].productID" value="'+productid+'"><h5><strong>'+productName+'</strong></h5><p><ul><li id="dp'+productid+'">DP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span><input type="hidden" name="products['+counter+'].dealerPrice" value="'+$(this).val()+'"></li></ul></p></td></tr>';
                 	}
                 	else{
-                		rowHTML = '<tr id="changeRow'+productid+'"><td><h5><strong>'+productName+'</strong></h5><p><ul><li id="mrp'+productid+'">MRP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span></li></ul></p></td></tr>';
-                	}	
+                		rowHTML = '<tr id="changeRow'+productid+'" data-counter="'+counter+'"><td><input type="hidden" name="products['+counter+'].productID" value="'+productid+'"><h5><strong>'+productName+'</strong></h5><p><ul><li id="mrp'+productid+'">MRP: <s class="text-danger"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+dad.attr("data-actual")+'</s> <span class="text-success"><i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val()+'</span><input type="hidden" name="products['+counter+'].marketPrice" value="'+$(this).val()+'"></li></ul></p></td></tr>';
+                	}
+            		$('#counter').val(counter);
                 	$('#changeTable').append(rowHTML);
+                	$('#submitChanges').prop("disabled",false);
             	}	
             }
             else{
@@ -285,6 +295,9 @@
                 	}
                 	
                 }
+            }
+            if($('#changeTable').children().children().length ==1){
+            	$('#submitChanges').prop("disabled",true);	
             }
             $(this).hide();
             dad.find('span').show();

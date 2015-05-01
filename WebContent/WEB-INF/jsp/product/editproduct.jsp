@@ -8,7 +8,7 @@
 		<input type="hidden" name="productID" id="productid" value="${product.productID}">
 		<input type="hidden" name="redirectcategoryedit" id="redirectcategoryedit" value ="">
 		<div class="form-group">
-			<label for="name" class="col-md-4">Product Category</label>
+			<label class="col-md-4 control-label">Product Category</label>
 			<div class="col-md-8">
 				<select id="productcategorymodal" name="productCategory" class="form-control">
 				<c:forEach var="category" items="${categories}">
@@ -17,34 +17,43 @@
 				</select>
 			</div>
 		</div>
-		<div class="form-group">
-			<label for="productname" class="col-md-4">Product Name</label>
+		<div class="form-group required">
+			<label class="col-md-4 control-label">Product Name</label>
 			<div class="col-md-8">
 				<input id="productname" name="productName" type="text" class="form-control" value="${product.productName}" placeholder="Enter Product Name..."/>
 			</div>
 		</div>
-		<div class="form-group">
-			<label for="openingbalance" class="col-md-4">Opening Balance (units)</label>
+		<div class="form-group required">
+			<label class="col-md-4 control-label">Opening Balance (units)</label>
 			<div class="col-md-8">
 				<input id="openingbalance" name="openingBalance" type="text" class="form-control" value="${product.openingBalance}" placeholder="Enter Opening Balance... ">
 			</div>
 		</div>
-		<div class="form-group">
-			<label for="costprice" class="col-md-4">Curr. Cost Price (<i class="fa fa-rupee extraPaddingLeftRight5"></i>)</label>
+		<div class="form-group required">
+			<label class="col-md-4 control-label">Curr. Cost Price</label>
 			<div class="col-md-8">
-				<input onblur="convertDecimal('costprice');" id="costprice" name="costPrice" type="text" class="form-control" value="${product.costPrice}" placeholder="Enter Curr. Cost Price... ">
+				<div class="input-group">
+	                <div class="input-group-addon"><i class="fa fa-rupee extraPaddingLeftRight5"></i></div>
+	                <input id="costprice" name="costPrice" type="text" class="form-control" value="${product.costPrice}" placeholder="Enter Curr. Cost Price... ">
+	            </div>
 			</div>
 		</div>
-		<div class="form-group">
-			<label for="dealerprice" class="col-md-4">Curr. DLP (<i class="fa fa-rupee extraPaddingLeftRight5"></i>)</label>
+		<div class="form-group required">
+			<label class="col-md-4 control-label">Curr. DLP</label>
 			<div class="col-md-8">
-				<input onblur="convertDecimal('dealerprice');" id="dealerprice" name="dealerPrice" type="text" class="form-control" value="${product.dealerPrice}" placeholder="Enter Curr. DLP... ">
+				<div class="input-group">
+	                <div class="input-group-addon"><i class="fa fa-rupee extraPaddingLeftRight5"></i></div>
+	                <input id="dealerprice" name="dealerPrice" type="text" class="form-control" value="${product.dealerPrice}" placeholder="Enter Curr. DLP... ">
+	            </div>
 			</div>
 		</div>
-		<div class="form-group">
-			<label for="marketprice" class="col-md-4">Curr. MRP (<i class="fa fa-rupee extraPaddingLeftRight5"></i>)</label>
+		<div class="form-group required">
+			<label class="col-md-4 control-label">Curr. MRP</label>
 			<div class="col-md-8">
-				<input onblur="convertDecimal('marketprice');" id="marketprice" name="marketPrice" type="text" class="form-control" value="${product.marketPrice}" placeholder="Enter Curr. MRP... ">
+				<div class="input-group">
+	                <div class="input-group-addon"><i class="fa fa-rupee extraPaddingLeftRight5"></i></div>
+	                <input id="marketprice" name="marketPrice" type="text" class="form-control" value="${product.marketPrice}" placeholder="Enter Curr. MRP... ">
+	            </div>
 			</div>
 		</div>
 		<div class="form-group">
@@ -91,6 +100,9 @@ $('#productcategorymodal').val("${product.productCategory}");
             openingBalance: {
                 message: 'The opening balance is not valid',
                 validators: {
+                	notEmpty: {
+                        message: 'The opening balance is required and cannot be empty'
+                    },
                     regexp: {
                     	regexp: /^[0-9]+$/,
                         message: 'The opening balance can only consist of numbers'
@@ -100,57 +112,38 @@ $('#productcategorymodal').val("${product.productCategory}");
             costPrice: {
                 message: 'The cost price is not valid',
                 validators: {
-                    regexp: {
-                    	regexp: /^[0-9.]+$/,
-                        message: 'The cost price can consist of numbers and point(.)'
-                    }
+                	 notEmpty: {
+                         message: 'The cost price is required'
+                     },
+                     numeric: {
+                         message: 'The cost price must be a number'
+                     }
                 }
             },
             marketPrice: {
                 message: 'The MRP is not valid',
                 validators: {
-                    regexp: {
-                    	regexp: /^[0-9.]+$/,
-                        message: 'The MRP can consist of numbers and point(.)'
-                    }
+                	 notEmpty: {
+                         message: 'The market price is required'
+                     },
+                     numeric: {
+                         message: 'The market price must be a number'
+                     }
                 }
             },
             dealerPrice: {
                 message: 'The DLP is not valid',
                 validators: {
-                    regexp: {
-                    	regexp: /^[0-9.]+$/,
-                        message: 'The DLP can consist of numbers and point(.)'
-                    }
+                	 notEmpty: {
+                         message: 'The dealer price is required'
+                     },
+                     numeric: {
+                         message: 'The dealer price must be a number'
+                     }
                 }
             }
             
         }
     });
 });
-</script>
-<script>
-function number_format(num)
-{
-	num="" + Math.floor(num*100.0 + 0.5)/100.0;
-	var i=num.indexOf(".");
-	if(num=="NaN"){
-		num="00.00";
-	}
-	else if (i<0 ) 
-		num+=".00";
-	else {
-		num=num.substring(0,i) + "." + num.substring(i + 1);
-		var nDec=(num.length - i) - 1;
-		if ( nDec==0 ) num+="00";
-		else if ( nDec==1 ) num+="0";
-		else if ( nDec>2 ) num=num.substring(0,i + 3);
-		}
-	return num;
-}
-	function convertDecimal(ele){
-		var price = $('#'+ele).val();
-		var temp=parseFloat(price);
-		$('#'+ele).val(number_format(temp));
-	}
 </script>

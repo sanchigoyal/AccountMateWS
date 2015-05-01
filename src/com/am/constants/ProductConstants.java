@@ -36,6 +36,7 @@ public class ProductConstants {
 	public static final String GET_PRODUCTS_DETAILS = "{call getProductsDetails(?,?)}";
 	public static final String GET_PRODUCT_DETAILS = "{call getProductDetails(?,?)}";
 	public static final String UPDATE_PRODUCT = "{call updateProduct(?,?,?,?,?,?,?,?)}";
+	public static final String UPDATE_PRODUCT_PRICE = "{call updateProductPrice(?,?,?,?)}";
 	public static final String UPDATE_CATEGORY = "{call updateCategory(?,?,?)}";
 	public static final String DELETE_PRODUCT = "{call deleteProduct(?,?)}";
 	public static final String DELETE_CATEGORY = "{call deleteCategory(?,?)}";
