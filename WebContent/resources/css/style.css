@@ -93,3 +93,9 @@
    content:"*";
    color:red;
 }
+
+.not-active {
+   pointer-events: none;
+   cursor: default;
+   color:grey;
+}

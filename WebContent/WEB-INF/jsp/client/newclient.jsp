@@ -12,46 +12,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-
     <title>Accountmate v1.2</title>
-
-    <!-- Bootstrap core CSS -->
-    <link href="resources/css/bootstrap.min.css" rel="stylesheet">
-    <link href="resources/css/font-awesome.min.css" rel="stylesheet">
-	<link href="resources/css/style.css" rel="stylesheet">
-	<link href="resources/css/bootstrapValidator.css" rel="stylesheet">
-	<link href="resources/css/bootstrap-formhelpers.min.css" rel="stylesheet">
-
-
   </head>
-
   <body>
-	<%
-		//allow access only if session exists
-		String userid = null;
-		String login = null;
-		if(session.getAttribute("userid") == null){
-		    response.sendRedirect("/AccountmateWS/start");
-		}else {
-				userid = (String) session.getAttribute("userid");
-				login = (String) session.getAttribute("login");
-		}
-	%>
     <!-- Header -->
-    <%@include file="header.jsp" %>
+    <%@include file="../headernew.jsp" %>
 	<!-- -- --- -->
 	
 	<div class="container">
 		<div class="row">
 			<div class="col-md-8">
-				<h2>Client</h2><hr/>
-				<div id="success">
+				<h2>Add client</h2><hr/>
+				<div id="success" class="hideIt">
 		            <div class="alert alert-success">
 		              <button type="button" class="close" data-dismiss="alert">&times;</button>
 		              <strong>Well done!</strong> Client added successfully.
 		            </div>
 		        </div>
-		        <div id="failure">
+		        <div id="failure" class="hideIt">
 		            <div class="alert alert-danger">
 		              <button type="button" class="close" data-dismiss="alert">&times;</button>
 		              <strong>Oh snap!</strong> Failed to add client. Please check with support team for assistance.
@@ -59,7 +37,7 @@
 		        </div>
 				<form:form class="form-horizontal" id="clientForm" action="/AccountmateWS/addClient" method="post">
 					<div class="form-group">
-						<label for="name" class="col-md-3">Client Category</label>
+						<label class="col-md-3 control-label">Client Category</label>
 						<div class="col-md-4">
 							<select name="clientCategory" id="clientcategory" class="form-control">
 								<c:forEach var="category" items="${categories}">
@@ -70,8 +48,8 @@
 							</select>
 						</div>
 					</div>
-					<div class="form-group">
-						<label for="name" class="col-md-3">Contact Name</label>
+					<div class="form-group required">
+						<label class="col-md-3 control-label">Contact Name</label>
 						<div class="col-md-4">
 							<input id="firstname" name="contactFirstName" type="text" class="form-control" placeholder="Enter First Name..."/>
 						</div>
@@ -80,33 +58,36 @@
 						</div>
 					</div>
  					<div class="form-group">
-						<label for="tinnumber" class="col-md-3">TIN</label>
+						<label class="col-md-3 control-label">TIN</label>
 						<div class="col-md-4">
 							<input type="text" id="tin" name="clientTIN" class="form-control" placeholder="Enter TIN #... ">
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="emailaddress" class="col-md-3">Email Address</label>
+						<label class="col-md-3 control-label">Email Address</label>
 						<div class="col-md-8">
 							<input type="email" id="email" name="clientEmail" class="form-control" placeholder="Enter Email... ">
 							<p class="help-block">Example: yourname@domain.com</p>
 						</div>
 					</div>
-					<div class="form-group">
-						<label for="accountname" class="col-md-3">Account/Business Name</label>
+					<div class="form-group required">
+						<label class="col-md-3 control-label">Account/Business Name</label>
 						<div class="col-md-8">
 							<input type="text" id="accountname" name="clientName" class="form-control" placeholder="Enter Account/Business Name... ">
 						</div>
 					</div>
 					<hr/>
 					<div class="form-group">
-						<label for="phonenumber" class="col-md-3">Phone Number</label>
+						<label class="col-md-3 control-label">Phone Number</label>
 						<div class="col-md-8">
-							<input type="text" id="phonenumber" name="clientPhoneNumber" class="form-control" placeholder="Enter Phone Number... ">
+							<div class="input-group">
+				                <div class="input-group-addon">+91</div>
+				                <input type="text" id="phonenumber" name="clientPhoneNumber" class="form-control" placeholder="Enter Phone Number... ">
+				            </div>
 						</div>
 					</div>
-					<div class="form-group">
-						<label for="address" class="col-md-3">Billing/Shipping Address</label>
+					<div class="form-group required">
+						<label class="col-md-3 control-label">Billing/Shipping Address</label>
 						<div class="col-md-8">
 							<input type="text" id="address" name="clientAddress" class="form-control" placeholder="Enter Address... ">
 						</div>
@@ -124,9 +105,9 @@
 					</div>
 					<hr/>
 					<div class="form-group">
-						<div class="col-md-3">
-							<label for="customdaystopay" >Custom Days to Pay</label>
-							<p class="help-block">All invoices to this client will use this number of days from the invoice date to be due.</p>
+						<div class="col-md-3 control-label">
+							<label>Custom Days to Pay</label>
+							<p class="help-block text-justify">All invoices to this client will use this number of days from the invoice date to be due.</p>
 						</div>
 						<div class="col-md-3">
 							<select id="customdaystopay" name="customDaysToPay" class="form-control">
@@ -139,15 +120,18 @@
 							</select>
 						</div>
 					</div>
-					<div class="form-group">
-						<label for="openingbalance" class="col-md-3">Opening Balance (<i class="fa fa-rupee extraPaddingLeftRight5"></i>)</label>
+					<div class="form-group required">
+						<label class="col-md-3 control-label">Opening Balance</label>
 						<div class="col-md-8">
-							<input onblur="convertDecimal();" type="text" id="openingbalance" name="OpeningBalance" class="form-control" placeholder="Enter Opening Balance... ">
+							<div class="input-group">
+								 <div class="input-group-addon"><i class="fa fa-rupee extraPaddingLeftRight5"></i></div>
+								 <input type="text" id="openingbalance" name="OpeningBalance" class="form-control" placeholder="Enter Opening Balance... ">
+							</div>
 						</div>
 					</div>
 					<div class="form-group">
 						<div class="col-md-10 col-md-offset-3">
-							<button type="submit" class="btn btn-primary">Add this client</button>
+							<button type="submit" class="btn btn-primary">Save</button>
 							<button type="reset" class="btn btn-default">Clear</button>
 						</div>
 					</div>
@@ -189,14 +173,10 @@
 	
 	
 	<!-- Footer -->
-	<%@include file="footer.jsp" %>
+	<%@include file="../footernew.jsp" %>
 	<!--  -- -- -->
 	
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-	<script src="resources/js/jquery.js"></script>
-    <script src="resources/js/bootstrap.min.js"></script>
-    <script src="resources/js/bootstrapValidator.js"></script>
-    <script src="resources/js/bootstrap-formhelpers.min.js"></script>
+   
     <script>
 		if("${success}" == "true")
 		{
@@ -212,20 +192,7 @@
 			document.getElementById("failure").style.display = "none";
 		}
 	</script>
-	<script type="text/javascript">
-    $(window).load(function(){
-    	if('<%=login%>' == "success")
-    	{
-    		document.getElementById("leftnav").style.display= "block";
-    		document.getElementById("logoutnav").style.display="block";
-    	}
-    	else{
-    		document.getElementById("leftnav").style.display= "none";
-    		document.getElementById("logoutnav").style.display="none";
-    	}
-        
-    });	
-	</script>
+	
 	<script>
 	$(document).ready(function() {
     $('#clientForm').bootstrapValidator({
@@ -238,6 +205,7 @@
         fields: {
         	contactFirstName: {
                 message: 'The firstname is not valid',
+                row: '.col-md-4',
                 validators: {
                     notEmpty: {
                         message: 'The firstname is required and cannot be empty'
@@ -255,6 +223,7 @@
             },
             contactLastName: {
                 message: 'The lastname is not valid',
+                row: '.col-md-4',
                 validators: {
                     notEmpty: {
                         message: 'The lastname is required and cannot be empty'
@@ -281,18 +250,9 @@
             },
             clientEmail: {
                 validators: {
-                    notEmpty: {
-                        message: 'The email address is required and cannot be empty'
-                    },
                     emailAddress: {
-                        message: 'The email address is not a valid'
-                    }/*,
-                    callback: {
-                        message: 'The email is not available',
-                        callback: function(value, validator) {
-                            return checkEmailAvailability()
-                        }
-                    }*/
+                        message: 'The email address is not valid'
+                    }
                 }
             },
             
@@ -316,9 +276,6 @@
             clientPhoneNumber: {
                 message: 'The phone number is not valid',
                 validators: {
-                    notEmpty: {
-                        message: 'The phone number is required and cannot be empty'
-                    },
                     stringLength: {
                         min: 10,
                         max: 10,
@@ -357,9 +314,11 @@
             OpeningBalance: {
                 message: 'The opening balance is not valid',
                 validators: {
-                    regexp: {
-                    	regexp: /^[0-9.]+$/,
-                        message: 'The opening balance can only consist of numbers and point(.)'
+                	notEmpty: {
+                        message: 'The opening balance is required'
+                    },
+                    numeric: {
+                        message: 'The opening balance must be a number'
                     }
                 }
             }
@@ -369,30 +328,5 @@
     });
 });
 </script>
-<script>
-function number_format(num)
-{
-	num="" + Math.floor(num*100.0 + 0.5)/100.0;
-	var i=num.indexOf(".");
-	if(num=="NaN"){
-		num="00.00";
-	}
-	else if (i<0 ) {
-		num+=".00";}
-	else {
-	num=num.substring(0,i) + "." + num.substring(i + 1);
-	var nDec=(num.length - i) - 1;
-	if ( nDec==0 ) num+="00";
-	else if ( nDec==1 ) num+="0";
-	else if ( nDec>2 ) num=num.substring(0,i + 3);
-	}
-	return num;
-}
-	function convertDecimal(){
-		var openingbalance = $('#openingbalance').val();
-		var temp=parseFloat(openingbalance);
-		$('#openingbalance').val(number_format(temp));
-	}
-</script>
-  </body>
+</body>
 </html>

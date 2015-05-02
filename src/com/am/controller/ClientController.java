@@ -42,7 +42,7 @@ public class ClientController {
 		 clientDAO.getCategoryDetails(categories);
 	     model.addAttribute("categories",categories);
 	     model.addAttribute("command",new ClientBean());
-	     return "newclient";
+	     return "client/newclient";
 	   }
 	
 	@RequestMapping("/clientList")
@@ -74,7 +74,7 @@ public class ClientController {
 		clientDAO.getCategoryDetails(categories);
 	    model.addAttribute("categories",categories);
 	    model.addAttribute("command",new ClientBean());
-		return "clientlist";
+		return "client/clientlist";
 	}
 	@RequestMapping("/deleteClient")
 	public String deleteClient(@ModelAttribute("AccountmateWS")ClientBean client,ModelMap model,HttpServletRequest request) {
@@ -109,7 +109,7 @@ public class ClientController {
 		model.addAttribute("command",new ClientBean());
 		clientDAO.getCategoryDetails(categories);
         model.addAttribute("categories",categories);
-		return "clientlist";
+		return "client/clientlist";
 	}
 	
 	@RequestMapping(value = "/getClientTIN", method = RequestMethod.GET)
@@ -153,7 +153,7 @@ public class ClientController {
 		model.addAttribute("transactions",transactions);
 		model.addAttribute("startdate",dates.get("startdate"));
 		model.addAttribute("enddate",dates.get("enddate"));
-		return "clientledger";
+		return "client/clientledger";
 	}
 	
 	@RequestMapping("/getClientTransactionByDates")
@@ -181,7 +181,7 @@ public class ClientController {
 		model.addAttribute("transactions",transactions);
 		model.addAttribute("startdate",dates.get("startdate"));
 		model.addAttribute("enddate",dates.get("enddate"));
-		return "clientledger";	
+		return "client/clientledger";	
 	}
 	
 	@RequestMapping(value = "/editClient", method = RequestMethod.GET)
@@ -199,7 +199,7 @@ public class ClientController {
 		clientDAO.getCategoryDetails(categories);
         model.addAttribute("categories",categories);
 		ModelAndView mav = new ModelAndView();
-		String viewName = "editclient";
+		String viewName = "client/editclient";
 		mav.setViewName(viewName);
 		return mav;		
 	}
@@ -231,7 +231,7 @@ public class ClientController {
 		clientDAO.getCategoryDetails(categories);
 	    model.addAttribute("categories",categories);
 	    model.addAttribute("command",new ClientBean());
-		return "newclient";
+		return "client/newclient";
 	}
 	
 	@RequestMapping("/updateClient")
@@ -274,6 +274,6 @@ public class ClientController {
 		model.addAttribute("command",new ClientBean());
 		clientDAO.getCategoryDetails(categories);
         model.addAttribute("categories",categories);
-		return "clientlist";
+		return "client/clientlist";
 	}
 }
