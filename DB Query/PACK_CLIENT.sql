@@ -277,20 +277,90 @@ CREATE PROCEDURE getClientTransactions(
          )
 BEGIN
 SELECT st.* FROM  
-(SELECT 
-	0 AS transaction_id, 0 AS client_id,'Previous Balance' AS detail,0 AS transaction_type_id,
+(SELECT 0 AS transaction_id, 0 AS client_id,'Previous Balance' AS detail,0 AS transaction_type_id,
 	'1000-01-01' AS transaction_date,0.00 AS debit_value,
-	COALESCE(sum(ct.credit_value)-sum(ct.debit_value),0) AS credit_value,0.00 AS balance,0 AS reference_id,
-	null AS reference_type,null AS reference_number
-	FROM 
-		client_transaction ct,
-		client c
-	WHERE
-		c.user_id =userID
-		and c.client_id =clientID
-		and ct.client_id = c.client_id
-		and c.close_action_id is null
-		and ct.transaction_date between '1000-01-01' and DATE_SUB(startdate,INTERVAL 1 DAY)
+	COALESCE(sum(pre.credit_value)-sum(pre.debit_value),0) AS credit_value,0.00 AS balance,0 AS reference_id,
+	null AS reference_type,null AS reference_number FROM
+	(SELECT 
+			ct.credit_value,ct.debit_value
+		FROM 
+			client_transaction ct,
+			client c
+		WHERE
+			c.user_id =userID
+			and c.client_id =clientID
+			and ct.client_id = c.client_id
+			and c.close_action_id is null
+			and ct.transaction_date between '1000-01-01' and DATE_SUB(startdate,INTERVAL 1 DAY)
+			and ct.transaction_details = 'Opening Balance'
+	UNION ALL
+	SELECT 
+			ct.credit_value,ct.debit_value
+		FROM 
+			client_transaction ct,
+			client c,
+			transaction_reference_type trt,
+			invoice i
+		WHERE
+			c.user_id =userID
+			and c.client_id =clientID
+			and ct.client_id = c.client_id
+			and c.close_action_id is null
+			and ct.transaction_date between '1000-01-01' and DATE_SUB(startdate,INTERVAL 1 DAY)
+			and ct.reference_type_id = trt.reference_type_id
+			and trt.reference_type = 'INVOICE'
+			and i.user_id = userID
+			and i.invoice_id = ct.reference_id
+			and i.close_action_id is null
+	UNION ALL
+	SELECT 
+			ct.credit_value,ct.debit_value
+		FROM 
+			client_transaction ct,
+			client c,
+			transaction_reference_type trt
+		WHERE
+			c.user_id =userID
+			and c.client_id =clientID
+			and ct.client_id = c.client_id
+			and c.close_action_id is null
+			and ct.transaction_date between '1000-01-01' and DATE_SUB(startdate,INTERVAL 1 DAY)
+			and ct.reference_type_id = trt.reference_type_id
+			and trt.reference_type = 'PAYMENT'
+	UNION all
+	SELECT 
+			ct.credit_value,ct.debit_value
+		FROM 
+			client_transaction ct,
+			client c,
+			transaction_reference_type trt,
+			expense e
+		WHERE
+			c.user_id =userID
+			and c.client_id =clientID
+			and ct.client_id = c.client_id
+			and c.close_action_id is null
+			and ct.transaction_date between '1000-01-01' and DATE_SUB(startdate,INTERVAL 1 DAY)
+			and ct.reference_type_id = trt.reference_type_id
+			and trt.reference_type = 'EXPENSE'
+			and e.user_id = userID
+			and e.expense_id = ct.reference_id
+			and e.close_action_id is null
+	UNION all
+	SELECT 
+			ct.credit_value,ct.debit_value
+		FROM 
+			client_transaction ct,
+			client c,
+			transaction_reference_type trt
+		WHERE
+			c.user_id =userID
+			and c.client_id =clientID
+			and ct.client_id = c.client_id
+			and c.close_action_id is null
+			and ct.transaction_date between '1000-01-01' and DATE_SUB(startdate,INTERVAL 1 DAY)
+			and ct.reference_type_id = trt.reference_type_id
+			and trt.reference_type = 'RECEIPT')pre
 UNION ALL
 SELECT ct.transaction_id, ct.client_id,ct.transaction_details AS detail,ct.transaction_type_id,ct.transaction_date,
 		ct.debit_value,ct.credit_value,ct.balance,ct.reference_id,null AS reference_type,null AS reference_number
