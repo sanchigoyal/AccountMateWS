@@ -133,7 +133,7 @@ public class ProductController {
 		model.addAttribute("products",products);
 		model.addAttribute("command",new ProductBean());
         model.addAttribute("categories",categories);
-		return "productpricelist";
+		return "product/productpricelist";
 	}
 	
 	/**
@@ -442,7 +442,7 @@ public class ProductController {
 		model.addAttribute("categories",categories);
 		model.addAttribute("totalstockvalue",totalStockValue);
 		model.addAttribute("command",new CategoryBean());
-		return "productcategories";
+		return "product/productcategories";
 	}
 	
 	/**
@@ -480,7 +480,7 @@ public class ProductController {
 		model.addAttribute("categories",categories);
 		model.addAttribute("totalstockvalue",totalStockValue);
 		model.addAttribute("command",new CategoryBean());
-		return "productcategories";
+		return "product/productcategories";
 	}
 	
 	/**
@@ -520,7 +520,7 @@ public class ProductController {
 		model.addAttribute("categories",categories);
 		model.addAttribute("totalstockvalue",totalStockValue);
 		model.addAttribute("command",new CategoryBean());
-		return "productcategories";
+		return "product/productcategories";
 	}
 	
 	/**
@@ -559,7 +559,7 @@ public class ProductController {
 		model.addAttribute("categories",categories);
 		model.addAttribute("totalstockvalue",totalStockValue);
 		model.addAttribute("command",new CategoryBean());
-		return "productcategories";
+		return "product/productcategories";
 	}
 	
 	/**
@@ -579,6 +579,9 @@ public class ProductController {
 		//Check if session exists
 		if(session.getAttribute(AccountConstants.USER_NAME)== null){
 			return "home";
+		}
+		for(ProductBean product:productList.getProducts()){
+			System.out.println("Product ID-"+product.getProductID()+" cost price-"+product.getCostPrice()+" dealer price-"+product.getDealerPrice()+" market-"+product.getMarketPrice());
 		}
 		productList.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to update product list :: User - "+productList.getUserID());
@@ -602,7 +605,7 @@ public class ProductController {
 		model.addAttribute("products",products);
 		model.addAttribute("command",new ProductBean());
         model.addAttribute("categories",categories);
-		return "productpricelist";
+		return "product/productpricelist";
 	}
 	
 	/**

@@ -24,13 +24,13 @@
 		<div class="row">
 			<div class="col-md-8">
 				<h2>Add product</h2><hr/>
-				<div id="success">
+				<div id="success" class="hideIt">
 		            <div class="alert alert-success">
 		              <button type="button" class="close" data-dismiss="alert">&times;</button>
 		              <strong>Well done!</strong> Product Added Successfully.
 		            </div>
 		        </div>
-		        <div id="failure">
+		        <div id="failure" class="hideIt">
 		            <div class="alert alert-danger" >
 		              <button type="button" class="close" data-dismiss="alert">&times;</button>
 		              <strong>Oh snap!</strong> Failed to add product. Please check with support team for assistance.
@@ -95,7 +95,7 @@
 				</form:form>
 			</div>
 			<div class="col-md-4">
-			<br/><br/><br/>
+				<br/><br/><br/>
 				<div class="well">
 					<h4><strong>Upload CSV file</strong></h4>
 					<div>

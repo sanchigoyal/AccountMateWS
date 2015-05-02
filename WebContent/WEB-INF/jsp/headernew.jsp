@@ -4,8 +4,10 @@
 <link href="resources/css/style.css" rel="stylesheet">
 <link href="resources/css/bootstrapValidator.css" rel="stylesheet">
 <link href="resources/css/bootstrap-formhelpers.min.css" rel="stylesheet">
-<link href="resources/css/datepicker.css" rel="stylesheet">
+<!-- Use date range picker instead of datepicker ------------
+<link href="resources/css/datepicker.css" rel="stylesheet">-->
 <link href="resources/css/dataTables.bootstrap.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" media="all" href="resources/css/daterangepicker-bs3.css" />
 
 <!-- Navigation Bar
 	===============================================================================================================-->

@@ -23,67 +23,66 @@
 			<div class="col-md-12">
 				<h2>${product.productName}</h2><hr/>	
 			</div>
-		</div>
-		<form class="form-inline" action="/AccountmateWS/getProductTransactionByDates" method="post">
-			<input type="hidden" id="productid" name="productid" value="${product.productID}">
-			<div class="bfh-datepicker col-md-offset-1 col-md-2" id="datefrom" data-name="datefrom" data-format="y-m-d" data-date="2014-04-04" >
+			<div class="col-md-4 col-md-offset-8">
+				<div id="daterange" class="form-control" style="cursor: pointer;margin-bottom:10px;">
+	                <i class="fa fa-calendar"></i>
+	                <span></span>
+	                <form id="dateChange" method="post" action="/AccountmateWS/getProductTransactionByDates">
+	                	<input type="hidden" id="productid" name="productid" value="${product.productID}">
+	                	<input type="hidden" id="datefrom" name="datefrom" value=""/>
+	                	<input type="hidden" id="dateto" name="dateto" value=""/> 
+	                </form>
+	          	</div>
 			</div>
-			<div class="bfh-datepicker col-md-offset-1 col-md-2" id="dateto" data-name="dateto" data-format="y-m-d" data-date="today" >
+			<div class="col-md-12">
+				<table id="transaction" class="table table-striped">
+					<thead>
+						<tr class="well">
+							<td class="col-md-2 text-center">Date</td>
+							<td class="col-md-3 text-center">Description</td>
+							<td class="col-md-1 text-center">Reference</td>
+							<td class="col-md-2 text-right">IN<i class="fa fa-arrow-down extraPaddingLeftRight5 text-red"></i></td>
+							<td class="col-md-2 text-right">OUT<i class="fa fa-arrow-up extraPaddingLeftRight5 text-green"></i></td>
+							<td class="col-md-2 text-right">Balance</td>
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach var="transaction" items="${transactions}">
+						<tr>
+							<td class="text-center">${transaction.transaction_date }</td>
+							<td class="text-center">${transaction.description}</td>
+							<td class="text-center">
+								<a data-toggle="modal" href="#viewInvoice" onclick="updateInvoiceModal('${transaction.reference}');">${transaction.invoice_number}</a>
+							</td>
+							<td class="text-right"> ${transaction.debit_value}</td>
+							<td class="text-right"> ${transaction.credit_value}</td>
+							<td class="text-right"> ${transaction.balance}</td>
+						</tr>
+					    </c:forEach>
+					</tbody>
+				</table>
+				<table class="table">
+					<tr class="well">
+							<td class="col-md-3"><strong>Total</strong></td>
+							<td class="col-md-2"></td>
+							<td class="col-md-1 text-center"></td>
+							<td class="col-md-2 text-right"><strong> ${product.productIn}</strong></td>
+							<td class="col-md-2 text-right"><strong> ${product.productOut}</strong></td>
+							<td class="col-md-2 text-right"><strong> ${product.productBalance}</strong></td>
+						</tr>
+				</table>
 			</div>
-			<button type="submit" class="btn btn-primary">Search</button>
-		</form>
-	</div>
-	
-	<div class="container">
-	<hr/>
-		<table id="transaction" class="table table-striped">
-			<thead>
-				<tr class="well">
-					<td class="col-md-2 text-center">Date</td>
-					<td class="col-md-3 text-center">Description</td>
-					<td class="col-md-1 text-center">Reference</td>
-					<td class="col-md-2 text-right">IN<i class="fa fa-arrow-down extraPaddingLeftRight5 text-red"></i></td>
-					<td class="col-md-2 text-right">OUT<i class="fa fa-arrow-up extraPaddingLeftRight5 text-green"></i></td>
-					<td class="col-md-2 text-right">Balance</td>
-				</tr>
-			</thead>
-			<tbody>
-				<c:forEach var="transaction" items="${transactions}">
-				<tr>
-					<td class="text-center">${transaction.transaction_date }</td>
-					<td class="text-center">${transaction.description}</td>
-					<td class="text-center">
-						<a data-toggle="modal" href="#viewInvoice" onclick="updateInvoiceModal('${transaction.reference}');">${transaction.invoice_number}</a>
-					</td>
-					<td class="text-right"> ${transaction.debit_value}</td>
-					<td class="text-right"> ${transaction.credit_value}</td>
-					<td class="text-right"> ${transaction.balance}</td>
-				</tr>
-			    </c:forEach>
-			</tbody>
-		</table>
-		<table class="table">
-			<tr class="well">
-					<td class="col-md-3"><strong>Total</strong></td>
-					<td class="col-md-2"></td>
-					<td class="col-md-1 text-center"></td>
-					<td class="col-md-2 text-right"><strong> ${product.productIn}</strong></td>
-					<td class="col-md-2 text-right"><strong> ${product.productOut}</strong></td>
-					<td class="col-md-2 text-right"><strong> ${product.productBalance}</strong></td>
-				</tr>
-		</table>
-		
-		<!----Invoice Modal--->
-		<div class="modal fade" id="viewInvoice" tabinex="-1" role="dialog" aria-hidden="true">
-			<div class="modal-dialog large">
-				<div id="invoice-content" class="modal-content">
-						<%@include file="../invoice.jsp" %>
+			<!----Invoice Modal--->
+			<div class="modal fade" id="viewInvoice" tabinex="-1" role="dialog" aria-hidden="true">
+				<div class="modal-dialog large">
+					<div id="invoice-content" class="modal-content">
+							<%@include file="../invoice.jsp" %>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 	
-
 	<!-- Footer -->
     <%@include file="../footernew.jsp" %>
 	<!-- -- --- -->
@@ -91,9 +90,6 @@
 		$(document).ready(function() {
 		    $('#transaction').dataTable();
 		} );
-		$(function(){
-			$('.datepicker').datepicker();
-		});
 	</script>
 	<script type="text/javascript">
     function updateInvoiceModal(invoiceid){
@@ -115,10 +111,60 @@
 	}
 	</script>
 	<script>
-	var datefrom = document.getElementById('datefrom');
-	datefrom.setAttribute('data-date','${startdate}');
-	var dateto = document.getElementById('dateto');
-	dateto.setAttribute('data-date','${enddate}');
+		$(document).ready(function() {
+	        var cb = function(start, end, label) {
+	          $('#daterange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+	          $('#datefrom').val(start.format('YYYY-MM-DD'));
+	          $('#dateto').val(end.format('YYYY-MM-DD'));
+	        };
+	    
+	     var optionSet = {
+	       startDate: moment().subtract(29, 'days'),
+	       endDate: moment(),
+	
+	       dateLimit: { days: 60 },
+	       showDropdowns: true,
+	       showWeekNumbers: true,
+	       timePicker: false,
+	       timePickerIncrement: 1,
+	       timePicker12Hour: true,
+	       ranges: {
+	          'Today': [moment(), moment()],
+	          'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+	          'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+	          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+	          'This Month': [moment().startOf('month'), moment().endOf('month')],
+	          'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+	       },
+	       opens: 'left',
+	       buttonClasses: ['btn btn-default'],
+	       applyClass: 'btn-small btn-primary',
+	       cancelClass: 'btn-small',
+	       format: 'MM/DD/YYYY',
+	       separator: ' to ',
+	       locale: {
+	           applyLabel: 'Search',
+	           cancelLabel: 'Clear',
+	           fromLabel: 'From',
+	           toLabel: 'To',
+	           customRangeLabel: 'Custom',
+	           daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr','Sa'],
+	           monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+	           firstDay: 1
+	       }
+	     };
+	     $('#daterange span').html(moment().subtract(29, 'days').format('MMMM D, YYYY') + ' - ' + moment().format('MMMM D, YYYY'));
+	     $('#daterange').daterangepicker(optionSet, cb);
+	     $('#daterange span').html(moment("${startdate}").format('MMMM D, YYYY') + ' - ' + moment("${enddate}").format('MMMM D, YYYY'));//MM-DD-YYYY
+	     $('#daterange').data('daterangepicker').setStartDate(moment("${startdate}"));
+	     $('#daterange').data('daterangepicker').setEndDate(moment("${enddate}"));
+	     $('#datefrom').val(moment("${startdate}").format('YYYY-MM-DD'));
+	     $('#dateto').val(moment("${enddate}").format('YYYY-MM-DD'));
+		});
+	//Date Change form submit
+	$('#daterange').on('apply.daterangepicker', function(ev, picker) {
+   		 $( "#dateChange" ).submit();		
+   	});
 	</script>
   </body>
 </html>

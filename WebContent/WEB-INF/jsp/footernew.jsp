@@ -36,6 +36,9 @@
     <script src="resources/js/bootstrap.min.js"></script>
     <script src="resources/js/bootstrapValidator.js"></script>
     <script src="resources/js/bootstrap-formhelpers.min.js"></script>
-    <script src="resources/js/bootstrap-datepicker.js"></script>
+    <!-- Use date range picker instead of datepicker ----- 
+    <script src="resources/js/bootstrap-datepicker.js"></script>-->
     <script src="resources/js/jquery.dataTables.min.js"></script>
     <script src="resources/js/dataTables.bootstrap.js"></script>
+   	<script type="text/javascript" src="resources/js/moment.js"></script>
+    <script type="text/javascript" src="resources/js/daterangepicker.js"></script>

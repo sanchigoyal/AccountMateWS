@@ -6,8 +6,8 @@
 <div class="modal-body">
 	<form:form class="form-horizontal"  id="editCategoryForm" action="/AccountmateWS/updateCategory" method="post">
 		<input type="hidden" id="editcategoryID" name="categoryID" value=""/>
-		<div class="form-group">
-			<label for="categoryname" class="col-md-3">Category Name</label>
+		<div class="form-group required">
+			<label class="col-md-3 control-label">Category Name</label>
 			<div class="col-md-8">
 				<input id="editcategoryname" name="category" type="text" class="form-control" value="" placeholder="Enter Category Name..."/>
 			</div>

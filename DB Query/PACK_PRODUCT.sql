@@ -211,10 +211,11 @@ CREATE PROCEDURE getProductTransactions(
          )
 BEGIN
 SELECT t.* FROM
-(SELECT 
-      0 AS stock_id,0 AS product_id,'Previous Balance' AS detail,
-	  0 AS transaction_type_id,'1000-01-01' AS transaction_date,COALESCE(sum(ps.in_value)- sum(ps.out_value),0) AS in_value,
-	  0.00 AS out_value,0.00 AS balance,0 AS invoice_id , null AS invoice_number
+(	SELECT 0 AS stock_id,0 AS product_id,'Previous Balance' AS detail,
+	  0 AS transaction_type_id,'1000-01-01' AS transaction_date,COALESCE(sum(pre.in_value)- sum(pre.out_value),0) AS in_value,
+	  0.00 AS out_value,0.00 AS balance,0 AS invoice_id , null AS invoice_number FROM
+	(SELECT 
+      ps.in_value,ps.out_value
     FROM
         product_stock ps, product p
     WHERE
@@ -223,6 +224,21 @@ SELECT t.* FROM
             and ps.product_id = p.product_id
 			and ps.transaction_date between '1000-01-01' and DATE_SUB(startdate,INTERVAL 1 DAY)
             and p.close_action_id is null
+			and ps.detail = 'Opening Balance'
+	UNION ALL
+	SELECT 
+      ps.in_value,ps.out_value
+    FROM
+        product_stock ps, product p, invoice i
+    WHERE
+        p.user_id = userID
+            and p.product_id = productID
+            and ps.product_id = p.product_id
+			and ps.transaction_date between '1000-01-01' and DATE_SUB(startdate,INTERVAL 1 DAY)
+            and p.close_action_id is null
+			and ps.detail <> 'Opening Balance'
+			and ps.invoice_id = i.invoice_id
+			and i.close_action_id is null)pre
 UNION ALL
 SELECT 
       ps.*,null AS invoice_number
@@ -366,19 +382,39 @@ from
         category.user_id = userID
             and category.close_action_id is null) cat
         LEFT OUTER JOIN
-    (select 
-        p.product_id,
-            p.product_category,
-            (SUM(ps.IN_VALUE) - SUM(ps.OUT_VALUE)) * pr.price AS STOCK_VALUE
-    from
-        product p, product_stock ps, price pr
-    where
-        pr.price_type = 1
-            and pr.close_action_id is null
-            and pr.product_id = p.product_id
-            and ps.product_id = p.product_id
-            and p.close_action_id is null
-    group by p.product_id) products ON products.product_category = cat.category_id
+    (SELECT prod.product_id,prod.product_category,SUM(prod.STOCK_VALUE) STOCK_VALUE FROM
+		(select 
+			p.product_id,
+					p.product_category,
+					(SUM(ps.IN_VALUE) - SUM(ps.OUT_VALUE)) * pr.price AS STOCK_VALUE
+			from
+				product p, product_stock ps, price pr
+			where
+				pr.price_type = 1
+					and pr.close_action_id is null
+					and pr.product_id = p.product_id
+					and ps.product_id = p.product_id
+					and p.close_action_id is null
+					and ps.detail = 'Opening Balance'
+			group by p.product_id
+		UNION all
+		select 
+				p.product_id,
+					p.product_category,
+					(SUM(ps.IN_VALUE) - SUM(ps.OUT_VALUE)) * pr.price AS STOCK_VALUE
+			from
+				product p, product_stock ps, price pr,invoice i
+			where
+				pr.price_type = 1
+					and pr.close_action_id is null
+					and pr.product_id = p.product_id
+					and ps.product_id = p.product_id
+					and p.close_action_id is null
+					and ps.detail <> 'Opening Balance'
+					and ps.invoice_id = i.invoice_id
+					and i.close_action_id is null
+		group by p.product_id )prod
+		group by prod.product_id) products ON products.product_category = cat.category_id
 GROUP BY cat.category_id
 ORDER By cat.category;
 END//
@@ -443,10 +479,31 @@ CREATE PROCEDURE updateProductPrice(
 		 IN marketPrice DECIMAL(8,2)
          )
 BEGIN
-DECLARE actionID INT DEFAULT 0;		
+DECLARE actionID INT DEFAULT 0;
+DECLARE oldCostPrice DECIMAL(8,2) DEFAULT 0;
+DECLARE oldDealerPrice DECIMAL(8,2) DEFAULT 0;
+DECLARE oldMarketPrice DECIMAL(8,2) DEFAULT 0;		
 call generateActionID('Update Product Price',actionID);
 
-if costPrice != 0 then
+SELECT price into oldCostPrice
+FROM price
+WHERE product_id = productID
+	AND price_type = 1
+	AND close_action_id is null;
+
+SELECT price into oldDealerPrice
+FROM price
+WHERE product_id = productID
+	AND price_type = 4
+	AND close_action_id is null;
+
+SELECT price into oldMarketPrice
+FROM price
+WHERE product_id = productID
+	AND price_type = 3
+	AND close_action_id is null;
+
+if costPrice != oldCostPrice then
 	UPDATE price 
 	SET 
 		close_action_id = actionID
@@ -457,7 +514,7 @@ if costPrice != 0 then
 	INSERT into price values(null,productID,1,costPrice,null,actionID);
 end if;
 
-if dealerPrice != 0 then
+if dealerPrice != oldDealerPrice then
 	UPDATE price 
 	SET 
 		close_action_id = actionID
@@ -468,7 +525,7 @@ if dealerPrice != 0 then
 	INSERT into price values(null,productID,4,dealerPrice,null,actionID);
 end if;
 
-if marketPrice != 0 then
+if marketPrice != oldMarketPrice then
 	UPDATE price 
 	SET 
 		close_action_id = actionID
@@ -481,3 +538,4 @@ end if;
 END//
 DELIMITER ;
 
+select count(*) from price 
