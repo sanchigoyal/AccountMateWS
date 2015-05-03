@@ -39,7 +39,8 @@ CREATE PROCEDURE savePurchaseItemDetails(
 		 IN priceWithVat DECIMAL(10,2),
 		 IN total DECIMAL(10,2),
 		 IN invoiceDate VARCHAR(100),
-		 IN clientID INT
+		 IN clientID INT,
+		 IN updateCP BOOLEAN
          )
 BEGIN
 DECLARE actionID INT DEFAULT 0;	
@@ -49,12 +50,13 @@ INSERT into invoice_item values(NULL,invoiceID,productID,quantity,priceWithOutVa
 SELECT account_name into clientName from client where client_id=clientID;		
 INSERT into product_stock values(null,productID,clientName,1,invoiceDate,quantity,0,0,invoiceID);
 
-UPDATE price 
-SET close_action_id = actionID
-WHERE product_id = productID
-AND price_type= 1;
-
-INSERT into price values(null,productID,1,priceWithVat,null,actionID);
+IF updateCP THEN
+	UPDATE price 
+	SET close_action_id = actionID
+	WHERE product_id = productID
+	AND price_type= 1;
+	INSERT into price values(null,productID,1,priceWithVat,null,actionID);
+END IF;
 END//
 DELIMITER ;
 

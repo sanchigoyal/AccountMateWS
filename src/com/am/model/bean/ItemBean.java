@@ -9,8 +9,22 @@ public class ItemBean {
 	private boolean applyVat;
 	private double vatPercent;
 	private double priceWithVat;
+	private double subTotal;
 	private double total;
+	private boolean updateCP;
 	
+	public boolean isUpdateCP() {
+		return updateCP;
+	}
+	public void setUpdateCP(boolean updateCP) {
+		this.updateCP = updateCP;
+	}
+	public double getSubTotal() {
+		return subTotal;
+	}
+	public void setSubTotal(double subTotal) {
+		this.subTotal = subTotal;
+	}
 	public String getProductName() {
 		return productName;
 	}

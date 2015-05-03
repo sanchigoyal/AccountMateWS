@@ -63,6 +63,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 					cs2.setDouble(7,item.getTotal());
 					cs2.setString(8,formatter.format(invoice.getDate()));
 					cs2.setInt(9,invoice.getClientID());
+					cs2.setBoolean(10,item.isUpdateCP());
 					cs2.execute();
 					cs2.clearParameters();
 				}

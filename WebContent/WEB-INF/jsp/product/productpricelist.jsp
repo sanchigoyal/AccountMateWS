@@ -176,7 +176,7 @@
             	//do nothing on error.
             }
             else{
-            if (dad.attr("data-actual") != $(this).val()){
+            if (dad.attr("data-actual") != parseFloat($(this).val())){
             	//Update Span Value
             	dad.css('background', 'yellow');
             	dad.find('span').html('<i class="fa fa-rupee extraPaddingLeftRight5"></i>'+$(this).val());

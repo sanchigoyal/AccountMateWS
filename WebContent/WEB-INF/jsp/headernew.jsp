@@ -8,6 +8,8 @@
 <link href="resources/css/datepicker.css" rel="stylesheet">-->
 <link href="resources/css/dataTables.bootstrap.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" media="all" href="resources/css/daterangepicker-bs3.css" />
+<link href="resources/css/select2.css" rel="stylesheet"/>
+<link href="resources/css/select2-bootstrap.css" rel="stylesheet"/>
 
 <!-- Navigation Bar
 	===============================================================================================================-->

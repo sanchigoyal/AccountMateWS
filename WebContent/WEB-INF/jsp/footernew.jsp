@@ -42,3 +42,4 @@
     <script src="resources/js/dataTables.bootstrap.js"></script>
    	<script type="text/javascript" src="resources/js/moment.js"></script>
     <script type="text/javascript" src="resources/js/daterangepicker.js"></script>
+    <script src="resources/js/select2.js"></script>

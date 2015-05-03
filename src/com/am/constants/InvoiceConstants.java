@@ -29,7 +29,7 @@ public class InvoiceConstants {
 	
 	/*---- Stored Procedures -----*/
 	public static final String SAVE_PURCHASE_INVOICE = "{call savePurchaseInvoice(?,?,?,?,?,?,?,?,?,?,?)}";
-	public static final String SAVE_PURCHASE_ITEM_DETAILS = "{call savePurchaseItemDetails(?,?,?,?,?,?,?,?,?)}";
+	public static final String SAVE_PURCHASE_ITEM_DETAILS = "{call savePurchaseItemDetails(?,?,?,?,?,?,?,?,?,?)}";
 	public static final String SAVE_SALES_INVOICE = "{call saveSalesInvoice(?,?,?,?,?,?,?,?,?,?,?)}";
 	public static final String SAVE_SALES_ITEM_DETAILS = "{call saveSalesItemDetails(?,?,?,?,?,?,?,?,?)}";
 	public static final String GET_INVOICE_DETAILS = "{call getInvoiceDetails(?,?)}";
