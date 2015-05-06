@@ -141,9 +141,7 @@ public class PaymentController {
 	@RequestMapping("/recordPayment")
 	 public String recordPayment(ModelMap model,HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		if(session.getAttribute("userid")== null){
-			return "home";
-		}
+		
 		int userid=Integer.parseInt((String)session.getAttribute("userid"));
 		LOGGER.info("Request to Payment Gateway :: User - "+userid);
 		List<ClientBean> clients = new ArrayList<ClientBean>();
@@ -165,9 +163,7 @@ public class PaymentController {
 		HttpSession session = request.getSession();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		Map<String,String> dates = new HashMap<String,String>();
-		if(session.getAttribute("userid")== null){
-			return "home";
-		}
+		
 		LOGGER.info("Request to save payment details :: User - "+session.getAttribute("userid"));
 		PaymentBean payment = null;
 		try{

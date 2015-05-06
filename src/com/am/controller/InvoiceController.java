@@ -54,9 +54,7 @@ public class InvoiceController {
 		HttpSession session = request.getSession();
 		List<ClientBean> clients = new ArrayList<ClientBean>();
 		List<ProductBean> products = new ArrayList<ProductBean>();
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
+		
 		int userid=Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME));
 		LOGGER.info("Request to create purchase invoice :: User - "+userid);
 		clientDAO.getClientsDetails(userid,clients,2);
@@ -127,9 +125,7 @@ public class InvoiceController {
 		Map<Integer,String> dates = new HashMap<Integer,String>();
 		List<ClientBean> clients = new ArrayList<ClientBean>();
 		List<ProductBean> products = new ArrayList<ProductBean>();
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
+		
 		int userid=Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME));
 		invoiceDAO.getLatestBillingDates(dates, userid);
 		LOGGER.info("Request to create sales invoice :: User - "+userid);
@@ -179,9 +175,7 @@ public class InvoiceController {
 		boolean flag = false;
 		List<ClientBean> clients = new ArrayList<ClientBean>();
 		List<ProductBean> products = new ArrayList<ProductBean>();
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
+		
 		InvoiceBean invoice = getInvoiceDetails(iBean);
 		invoice.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to save purchase invoice :: User - "+invoice.getUserID());
@@ -234,9 +228,6 @@ public class InvoiceController {
 		boolean flag = false;
 		List<ClientBean> clients = new ArrayList<ClientBean>();
 		List<ProductBean> products = new ArrayList<ProductBean>();
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
 		InvoiceBean invoice = getInvoiceDetails(iBean);
 		invoice.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to save sales invoice :: User - "+invoice.getUserID());
@@ -299,9 +290,6 @@ public class InvoiceController {
 		List<InvoiceBean> deletedInvoices = new ArrayList<InvoiceBean>();
 		Map<String,String> dates = new HashMap<String,String>();
 		
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
 		invoice.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to show purchase book :: User - "+invoice.getUserID());
 		if(request.getParameter("datefrom")!= null && !request.getParameter("datefrom").equals("")){
@@ -345,9 +333,6 @@ public class InvoiceController {
 		List<InvoiceBean> invoicesUnPaid = new ArrayList<InvoiceBean>();
 		List<InvoiceBean> deletedInvoices = new ArrayList<InvoiceBean>();
 		
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
 		invoice.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to show sales book :: User - "+invoice.getUserID());
 		if(request.getParameter("datefrom")!= null && !request.getParameter("datefrom").equals("")){
@@ -393,9 +378,6 @@ public class InvoiceController {
 		List<InvoiceBean> invoicesUnPaid = new ArrayList<InvoiceBean>();
 		List<InvoiceBean> deletedInvoices = new ArrayList<InvoiceBean>();
 		
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
 		invoice.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to delete a invoice :: Invoice ID - "+invoice.getInvoiceID()+" :: User - "+invoice.getUserID());
 		dates.put("startdate",request.getParameter("redirectstartdate"));

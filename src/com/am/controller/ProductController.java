@@ -43,9 +43,6 @@ public class ProductController {
 	   public String createNewProduct(ModelMap model,HttpServletRequest request) {
 		  List<CategoryBean> categories = new ArrayList<CategoryBean>();
 		  HttpSession session = request.getSession();
-			if(session.getAttribute(AccountConstants.USER_NAME)== null){
-				return "home";
-			}
 		  int userid=Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME));
 		  productDAO.getCategoryDetails(userid, categories);
 	      model.addAttribute("categories",categories);
@@ -68,10 +65,6 @@ public class ProductController {
 		List<ProductBean> products = new ArrayList<ProductBean>();
 		int category =0;
 		double totalStockValue = 0;
-		// Check if session exists
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
 		pBean.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request for Product List :: User - "+pBean.getUserID());
 		//Check for the requested category
@@ -110,10 +103,6 @@ public class ProductController {
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
 		List<ProductBean> products = new ArrayList<ProductBean>();
 		int category =0;
-		// Check if session exists
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
 		pBean.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request for Product Price List :: User - "+pBean.getUserID());
 		//Check for the requested category
@@ -148,10 +137,6 @@ public class ProductController {
 		boolean flag=false;
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
 		HttpSession session = request.getSession();
-		//Check if session exists
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
 		product.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to add a new product :: User - "+product.getUserID());
 		LOGGER.debug("Request Details - Product Category - "+product.getProductCategory()+" :: Product - "+product.getProductName()
@@ -184,10 +169,6 @@ public class ProductController {
 				@RequestParam("productid") String productid,HttpServletRequest request) {
 			HttpSession session = request.getSession();
 			ProductBean product = new ProductBean();
-			//Check if session exists
-			if(session.getAttribute(AccountConstants.USER_NAME)== null){
-				return "home";
-			}
 			product.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 			LOGGER.info("Request to get product quantity :: User - "+product.getUserID());
 			product.setProductID(Integer.parseInt(productid));
@@ -209,10 +190,6 @@ public class ProductController {
 				@RequestParam("productid") String productid,HttpServletRequest request) {
 			HttpSession session = request.getSession();
 			ProductBean product = new ProductBean();
-			//Check if session exists
-			if(session.getAttribute(AccountConstants.USER_NAME)== null){
-				return "home";
-			}
 			product.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 			LOGGER.info("Request to get product DLP :: User - "+product.getUserID());
 			product.setProductID(Integer.parseInt(productid));
@@ -237,10 +214,6 @@ public class ProductController {
 		List<TransactionBean> transactions = new ArrayList<TransactionBean>();
 		ProductBean product = new ProductBean();
 		Map<String,String> dates = new HashMap<String,String>();
-		//Check if session exists
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
 		if(request.getParameter("productid")== null || request.getParameter("productid")==""){
 			return "home";
 		}
@@ -274,10 +247,6 @@ public class ProductController {
 		List<TransactionBean> transactions = new ArrayList<TransactionBean>();
 		ProductBean product = new ProductBean();
 		Map<String,String> dates = new HashMap<String,String>();
-		//Check if session exists
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
 		if(request.getParameter("productid")== null || request.getParameter("productid")==""){
 			return "home";
 		}
@@ -339,10 +308,7 @@ public class ProductController {
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
 		int category = 0;
 		double totalStockValue = 0;
-		//Check if session exists
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
+		
 		product.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to update product :: User - "+product.getUserID()+" :: Product ID - "+product.getProductID());
 		LOGGER.debug("Request Details - Product ID - "+product.getProductID()+" :: Product Category - "+product.getProductCategory()
@@ -390,10 +356,7 @@ public class ProductController {
 		boolean flag=false;
 		List<ProductBean> products = new ArrayList<ProductBean>();
 		double totalStockValue = 0;
-		//Check if session exists
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
+		
 		product.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to delete a product :: Product ID - "+product.getProductID()
 				+" :: User - "+product.getUserID());
@@ -431,9 +394,7 @@ public class ProductController {
 	@RequestMapping("/productCategories")
 	 public String getProductCategories(ModelMap model,HttpServletRequest request) {
 		HttpSession session = request.getSession();
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
+		
 		int userid=Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME));
 		LOGGER.info("Request for Product Category List :: User - "+userid);
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
@@ -459,10 +420,7 @@ public class ProductController {
 		HttpSession session = request.getSession();
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
 		double totalStockValue = 0;
-		//Check if session exists
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
+		
 		category.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to add a new category :: User - "+category.getUserID());
 		LOGGER.debug("Request Details - Category - "+category.getCategory()+" :: User - "+category.getUserID());
@@ -496,10 +454,7 @@ public class ProductController {
 		HttpSession session = request.getSession();
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
 		double totalStockValue = 0;
-		//Check if session exists
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
+		
 		category.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to update category :: User - "+category.getUserID());
 		LOGGER.debug("Request Details - Category ID - "+category.getCategoryID()+" :: Category - "+category.getCategory()
@@ -536,10 +491,7 @@ public class ProductController {
 		HttpSession session = request.getSession();
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
 		double totalStockValue = 0;
-		//Check if session exists
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
+		
 		category.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to delete category :: User - "+category.getUserID());
 		LOGGER.debug("Request Details - Category ID - "+category.getCategoryID()+" :: User - "+category.getUserID());
@@ -576,10 +528,7 @@ public class ProductController {
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
 		List<ProductBean> products = new ArrayList<ProductBean>();
 		int category =0;
-		//Check if session exists
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
+		
 		for(ProductBean product:productList.getProducts()){
 			System.out.println("Product ID-"+product.getProductID()+" cost price-"+product.getCostPrice()+" dealer price-"+product.getDealerPrice()+" market-"+product.getMarketPrice());
 		}

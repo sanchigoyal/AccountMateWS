@@ -42,10 +42,6 @@ public class ClientController {
 	@RequestMapping("/newClient")
 	   public String newClient(ModelMap model,HttpServletRequest request) {
 		 List<CategoryBean> categories = new ArrayList<CategoryBean>();
-		 HttpSession session = request.getSession();
-		 if(session.getAttribute(AccountConstants.USER_NAME)== null){
-		 	return "home";
-		 }
 		 clientDAO.getCategoryDetails(categories);
 	     model.addAttribute("categories",categories);
 	     model.addAttribute("command",new ClientBean());
@@ -66,9 +62,6 @@ public class ClientController {
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
 		ClientBean client = new ClientBean();
 		double totalBalance = 0;
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
 		client.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request for client list :: User - "+client.getUserID());
 		if(request.getParameter("option")!=null && request.getParameter("option") !=""){
@@ -106,9 +99,6 @@ public class ClientController {
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
 		double totalBalance = 0;
 		
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
 		client.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to delete a client :: Client ID - "+client.getClientID()
 				+" :: User - "+client.getUserID());
@@ -145,9 +135,7 @@ public class ClientController {
 	public @ResponseBody String processAJAXRequest(@RequestParam("clientid") String clientid,HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		ClientBean client = new ClientBean();
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
+	
 		client.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to get Client TIN :: User - "+client.getUserID());
 		client.setClientID(Integer.parseInt(clientid));
@@ -173,9 +161,6 @@ public class ClientController {
 		ClientBean client = new ClientBean();
 		Map<String,String> dates = new HashMap<String,String>();
 		
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
 		if(request.getParameter("clientid")== null || request.getParameter("clientid")==""){
 			return "home";
 		}
@@ -207,9 +192,7 @@ public class ClientController {
 		List<TransactionBean> transactions = new ArrayList<TransactionBean>();
 		ClientBean client = new ClientBean();
 		Map<String,String> dates = new HashMap<String,String>();
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
+		
 		if(request.getParameter("clientid")== null || request.getParameter("clientid")==""){
 			return "home";
 		}
@@ -268,9 +251,7 @@ public class ClientController {
 		boolean flag = false;
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
 		HttpSession session =request.getSession();
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
+		
 		client.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to add a new client :: User - "+client.getUserID());
 		LOGGER.debug("Request Details - Client Category - "+client.getClientCategory()+" :: Client Name - "+client.getClientName()
@@ -305,9 +286,7 @@ public class ClientController {
 		boolean flag=false;
 		HttpSession session =request.getSession();
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
-		if(session.getAttribute(AccountConstants.USER_NAME)== null){
-			return "home";
-		}
+		
 		client.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to update client :: User - "+client.getUserID()+" :: Client ID - "+client.getClientID());
 		LOGGER.debug("Request Details - Client Category - "+client.getClientCategory()+" :: Client Name - "+client.getClientName()
