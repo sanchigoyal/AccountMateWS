@@ -81,7 +81,7 @@
 	</script>
     
     <!-- Header -->
-    <%@include file="../headernew.jsp" %>
+    <%@include file="../layout/headernew.jsp" %>
 	<!-- -- --- -->
 	
 	<!--Client list
@@ -232,7 +232,7 @@
 	</div>
 	
 	<!-- Footer -->
-    <%@include file="../footernew.jsp" %>
+    <%@include file="../layout/footernew.jsp" %>
 	<!-- -- --- -->
     <script>
 		if("${success}" == "true")

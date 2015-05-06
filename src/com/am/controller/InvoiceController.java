@@ -85,7 +85,7 @@ public class InvoiceController {
 		invoices = invoiceDAO.getUnpaidInvoiceList(client,1);
 		model.addAttribute("invoices",invoices);
 		ModelAndView mav = new ModelAndView();
-		String viewName = "paymentgatewayinvoicedropdown";
+		String viewName = "layout/gatewayinvoicedropdown";
 		mav.setViewName(viewName);
 		return mav;
 	}
@@ -108,7 +108,7 @@ public class InvoiceController {
 		invoices = invoiceDAO.getUnpaidInvoiceList(client,2);
 		model.addAttribute("invoices",invoices);
 		ModelAndView mav = new ModelAndView();
-		String viewName = "receiptgatewayinvoicedropdown";
+		String viewName = "layout/gatewayinvoicedropdown";
 		mav.setViewName(viewName);
 		return mav;
 	}
@@ -160,7 +160,7 @@ public class InvoiceController {
 		invoiceDAO.getInvoiceDetails(invoice);
 		model.addAttribute("invoice",invoice);
 		ModelAndView mav = new ModelAndView();
-		String viewName = "invoice";
+		String viewName = "invoice/invoice";
 		mav.setViewName(viewName);
 		return mav;
 	}

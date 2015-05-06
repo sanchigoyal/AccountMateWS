@@ -15,7 +15,7 @@
 
   <body>
     <!-- Header -->
-    <%@include file="../headernew.jsp" %>
+    <%@include file="../layout/headernew.jsp" %>
 	<!-- -- --- -->
 	
 	<div class="container">
@@ -76,7 +76,7 @@
 			<div class="modal fade" id="viewInvoice" tabinex="-1" role="dialog" aria-hidden="true">
 				<div class="modal-dialog large">
 					<div id="invoice-content" class="modal-content">
-							<%@include file="../invoice.jsp" %>
+							<%@include file="../invoice/invoice.jsp" %>
 					</div>
 				</div>
 			</div>
@@ -84,7 +84,7 @@
 	</div>
 	
 	<!-- Footer -->
-    <%@include file="../footernew.jsp" %>
+    <%@include file="../layout/footernew.jsp" %>
 	<!-- -- --- -->
 	<script>
 		$(document).ready(function() {

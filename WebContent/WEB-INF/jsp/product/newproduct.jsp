@@ -17,7 +17,7 @@
 
   <body>
     <!-- Header -->
-    <%@include file="../headernew.jsp" %>
+    <%@include file="../layout/headernew.jsp" %>
 	<!-- -- --- -->
 	
 	<div class="container">
@@ -129,7 +129,7 @@
 	</div>
 
 	<!-- Footer -->
-    <%@include file="../footernew.jsp" %>
+    <%@include file="../layout/footernew.jsp" %>
 	
 	<!--Block of code to display success or failure message --- -->
     <script>

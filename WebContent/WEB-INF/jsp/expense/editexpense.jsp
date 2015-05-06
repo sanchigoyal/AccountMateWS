@@ -19,8 +19,8 @@
 				</div>
 			</div>
 		</div>
-		<div class="form-group">
-			<label for="name" class="col-md-4">Expense Category</label>
+		<div class="form-group required">
+			<label class="col-md-4 control-label">Expense Category</label>
 			<div class="col-md-8">
 				<select id="expensecategorymodal" name="expenseCategoryID" class="form-control">
 				<c:forEach var="category" items="${categories}">
@@ -30,19 +30,19 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="description" class="col-md-4">Description</label>
+			<label class="col-md-4 control-label">Description</label>
 			<div class="col-md-8">
 				<input id="description" name="description" type="text" class="form-control" value="${expense.description}" placeholder="Enter Description..."/>
 			</div>
 		</div>
-		<div class="form-group">
-			<label for="amount" class="col-md-4">Amount</label>
+		<div class="form-group required">
+			<label class="col-md-4 control-label">Amount</label>
 			<div class="col-md-8">
 				<input id="amount" name="amount" type="text" class="form-control" value="${expense.amount}" placeholder="Enter Amount... ">
 			</div>
 		</div>
-		<div class="form-group">
-			<label for="name" class="col-md-4">Mode of Payment</label>
+		<div class="form-group required">
+			<label class="col-md-4 control-label">Mode of Payment</label>
 			<div class="col-md-8">
 				<select id="by" class="form-control"  name="transactionBy" onChange="toggleBank();">
 					<option value="1">Cash</option>
@@ -51,8 +51,8 @@
 			</div>
 		</div>
 		<div id="bankdetails">
-			<div class="form-group">
-				<label for="name" class="col-md-4">Bank</label>
+			<div class="form-group required">
+				<label class="col-md-4 control-label">Bank</label>
 				<div class="col-md-8">
 					<select disabled id="bank" class="form-control"  name="bankID">
 						<c:forEach var="bank" items="${banks}">
@@ -62,7 +62,7 @@
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="chequeNumber" class="col-md-4">Cheque Number</label>
+				<label class="col-md-4 control-label">Cheque Number</label>
 				<div class="col-md-8">
 					<input disabled id="chequeNumber" name="chequeNumber" type="text" class="form-control" value="${expense.chequeNumber}" placeholder="Enter Cheque #... ">
 				</div>
@@ -143,31 +143,52 @@ toggleBank();
        $('#expensemodaldate input').val(moment("${expense.expenseDate}").format('YYYY-MM-DD'));
        $('#expensemodaldate').daterangepicker(optionSet2, cb2);
 	});
-       
-   
-    </script>	
-<script>
-function number_format(num)
-{
-	num="" + Math.floor(num*100.0 + 0.5)/100.0;
-	var i=num.indexOf(".");
-	if(num=="NaN"){
-		num="00.00";
-	}
-	else if (i<0 ) 
-		num+=".00";
-	else {
-		num=num.substring(0,i) + "." + num.substring(i + 1);
-		var nDec=(num.length - i) - 1;
-		if ( nDec==0 ) num+="00";
-		else if ( nDec==1 ) num+="0";
-		else if ( nDec>2 ) num=num.substring(0,i + 3);
-		}
-	return num;
-}
-	function convertDecimal(ele){
-		var price = $('#'+ele).val();
-		var temp=parseFloat(price);
-		$('#'+ele).val(number_format(temp));
-	}
 </script>
+<script>
+	$(document).ready(function() {
+    $('#expenseForm').bootstrapValidator({
+        // To use feedback icons, ensure that you use Bootstrap v3.1.0 or later
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+        	description: {
+                message: 'The description is not valid',
+                validators: {
+                    stringLength: {
+                        min: 0,
+                        max: 30,
+                        message: 'The description must be more than 3 and less than 30 characters long'
+                    },
+                    regexp: {
+                        regexp: /^[a-z A-Z0-9_]+$/,
+                        message: 'The description can consist of alphabetical, number and underscore'
+                    }
+                }
+            },
+            amount: {
+                message: 'The amount is not valid',
+                validators: {
+                    notEmpty: {
+                        message: 'The amount is required'
+                    },
+                    numeric: {
+                        message: 'The amount must be a number'
+                    }
+                }
+            },
+            chequeNumber: {
+                message: 'The cheque number is not valid',
+                validators: {
+                    regexp: {
+                        regexp: /^[a-z A-Z0-9_]+$/,
+                        message: 'The cheque number can consist of alphabetical, number and underscore'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>	

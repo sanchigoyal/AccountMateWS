@@ -12,75 +12,60 @@ pageEncoding="ISO-8859-1"%>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-
     <title>Accountmate v1.2</title>
-
-    <!-- Bootstrap core CSS -->
-    <link href="resources/css/bootstrap.min.css" rel="stylesheet">
-    <link href="resources/css/font-awesome.min.css" rel="stylesheet">
-	<link href="resources/css/style.css" rel="stylesheet">
-	<link href="resources/css/bootstrapValidator.css" rel="stylesheet">
-	<link href="resources/css/bootstrap-formhelpers.min.css" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" media="all" href="resources/css/daterangepicker-bs3.css" />
-      
   </head>
-
   <body>
-	<%
-		//allow access only if session exists
-		String userid = null;
-		String login = null;
-		if(session.getAttribute("userid") == null){
-		    response.sendRedirect("/AccountmateWS/start");
-		}else {
-				userid = (String) session.getAttribute("userid");
-				login = (String) session.getAttribute("login");
-		}
-	%>
-	
 	<input type="hidden" name="counter" id="counter" value="0" /> 
 	<script>
 		function addRow()
 		{	
 			var currentCounter =$('#counter').val();
 			var randomnumber=parseInt(currentCounter)+1;
-			var rowHtml = '<tr id="row'+randomnumber+'"><td align="right"><a href="javascript:" onclick="$(\'#row'+randomnumber+'\').remove();calcTotal();" title="Delete this row"><strong>X</strong></a><input type="hidden" class="rowid" value="'+randomnumber+'"/></td><td><select id="expenseCategory'+randomnumber+'"  name="expenses['+randomnumber+'].expenseCategoryID" class="form-control"><c:forEach var="category" items="${categories}"><option value="${category.categoryID}">${category.category}</option></c:forEach></select></td><td><input id="description'+randomnumber+'" name="expenses['+randomnumber+'].description" type="text" class="form-control" value=""/></td><td><input  id="amount'+randomnumber+'" name="expenses['+randomnumber+'].amount" type="text" class="form-control text-right" value="0.00" onkeyup="calcTotal();"/></td><td><select id="by'+randomnumber+'" name="expenses['+randomnumber+'].transactionBy" class="form-control" onChange="toggleChequeDetails('+randomnumber+');calcTotal();"><option value="1">Cash</option><option value="2">Cheque</option></select></td><td><select disabled id="bank'+randomnumber+'" name="expenses['+randomnumber+'].bankID" class="form-control" style="height: 20px;padding-bottom: 0px;padding-top: 0px;"><option value="1">Bank1</option><option value="2">Bank2</option></select><input  disabled id="chequenumber'+randomnumber+'" name="expenses['+randomnumber+'].chequeNumber" type="text" value="" class="form-control" style="height: 20px;" placeholder="Cheque Number.."/></td></tr>';
+			var rowHtml = '<tr id="row'+randomnumber+'"><td align="center"><a href="javascript:" onclick="$(\'#row'+randomnumber+'\').remove();calcTotal();" title="Delete this row"><strong>X</strong></a><input type="hidden" class="rowid" value="'+randomnumber+'"/></td><td><select id="expenseCategory'+randomnumber+'"  name="expenses['+randomnumber+'].expenseCategoryID" class="form-control"><c:forEach var="category" items="${categories}"><option value="${category.categoryID}">${category.category}</option></c:forEach></select></td><td><input id="description'+randomnumber+'" name="expenses['+randomnumber+'].description" type="text" class="form-control description" value=""/></td><td><input  id="amount'+randomnumber+'" name="expenses['+randomnumber+'].amount" type="text" class="form-control text-right price" value="0.00" onkeyup="calcTotal();"/></td><td><select id="by'+randomnumber+'" name="expenses['+randomnumber+'].transactionBy" class="form-control" onChange="toggleChequeDetails('+randomnumber+');calcTotal();"><option value="1">Cash</option><option value="2">Cheque</option></select></td><td><select disabled id="bank'+randomnumber+'" name="expenses['+randomnumber+'].bankID" class="form-control" style="height: 20px;padding-bottom: 0px;padding-top: 0px;"><c:forEach var="bank" items="${banks}"><option value="${bank.clientID}">${bank.clientName}</option></c:forEach></select><input  disabled id="chequenumber'+randomnumber+'" name="expenses['+randomnumber+'].chequeNumber" type="text" value="" class="form-control" style="height: 20px;" placeholder="Cheque Number.."/></td></tr>';
 			$('#counter').val(randomnumber);
 			$('#expense-table').append(rowHtml);
 		}
 	</script>
 	
     <!-- Header -->
-    <%@include file="header.jsp" %>
+    <%@include file="../layout/headernew.jsp" %>
 	<!-- -- --- -->
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12">
-				<h2>Expenses</h2>
+				<h2>Expenses</h2><hr/>
 			</div>
-		</div>
-	</div>
-	<div id="expense-input" class="container">
-		<hr/>
-		<form:form id="invoiceForm" class="form-horizontal" method="post" action="/AccountmateWS/saveExpenses" onSubmit="updateStartEndDate();">
-			<input type="hidden" name="redirectsavestartdate" id="redirectsavestartdate" value=""/>
-			<input type="hidden" name="redirectsaveenddate" id="redirectsaveenddate" value=""/>
-			<div class="row">
-				<div class="col-md-9">
-					<a onClick="addRow();"><i class="fa fa-plus-square extraPaddingLeftRight5"></i>Add rows</a>	
-				</div>
-				<div class="col-md-3">
-					<div>
-						<div id="expensedate" class="form-control" style="cursor: pointer;margin-bottom:10px;">
-		                  <i class="fa fa-calendar"></i>
-		                  <span></span> <b class="caret"></b>
-		                  <input type="hidden" name="expdate" value=""/>
-		            	</div>
+			<div class="col-md-12">
+				<div class="hideIt" id="success">
+		            <div class="alert alert-success" >
+		              <button type="button" class="close" data-dismiss="alert">&times;</button>
+		              <strong>Well done!</strong> ${message}
+		            </div>
+		        </div>
+		        <div class="hideIt" id="failure">
+		            <div class="alert alert-danger" >
+		              <button type="button" class="close" data-dismiss="alert">&times;</button>
+		              <strong>Oh snap!</strong> ${message}
+		            </div>
+		        </div>
+		    </div>
+			<div id="expense-input" class="hideIt">
+				<form:form id="invoiceForm" class="form-horizontal" method="post" action="/AccountmateWS/saveExpenses" onSubmit="updateStartEndDate();">
+					<input type="hidden" name="redirectsavestartdate" id="redirectsavestartdate" value=""/>
+					<input type="hidden" name="redirectsaveenddate" id="redirectsaveenddate" value=""/>
+					<div class="col-md-9">
+						<a onClick="addRow();"><i class="fa fa-plus-square extraPaddingLeftRight5"></i>Add rows</a>	
 					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-md-9">
+					<div class="col-md-3">
+						<div>
+							<div id="expensedate" class="form-control" style="cursor: pointer;margin-bottom:10px;">
+			                  <i class="fa fa-calendar"></i>
+			                  <span></span> <b class="caret"></b>
+			                  <input type="hidden" name="expdate" value=""/>
+			            	</div>
+						</div>
+					</div>
+					<div class="col-md-9">
 							<table id="expense-table" class="table">
 								<thead>
 									<tr class="well">
@@ -94,7 +79,7 @@ pageEncoding="ISO-8859-1"%>
 								</thead>
 								<tbody>
 									<tr id="row0">
-										<td align="right" style="color:#FFFFFF">X
+										<td style="color:#FFFFFF">X
 										<input type="hidden" class="rowid" value="0"/>
 										</td>
 										<td>
@@ -105,10 +90,10 @@ pageEncoding="ISO-8859-1"%>
 											</select>
 										</td>
 										<td>
-											<input id="description0"  name="expenses[0].description" type="text" class="form-control" value=""/>
+											<input id="description0"  name="expenses[0].description" type="text" class="form-control description" value=""/>
 										</td>
 										<td>
-											<input  id="amount0" type="text"  name="expenses[0].amount" class="form-control text-right" value="0.00" onkeyup="calcTotal();"/>
+											<input  id="amount0" type="text"  name="expenses[0].amount" class="form-control text-right price" value="0.00" onkeyup="calcTotal();"/>
 										</td>
 										<td>
 											<select id="by0" class="form-control"  name="expenses[0].transactionBy" onChange="toggleChequeDetails('0');calcTotal();">
@@ -126,53 +111,37 @@ pageEncoding="ISO-8859-1"%>
 										</td>
 									</tr>
 								</tbody>
-						</table>
-						<input type="submit" class="btn btn-primary pull-right" value="Save">
-				</div>
-				<div class="col-md-3">
-					<div class="panel panel-success">
-							<div class="panel-heading">Total</div>
-							  <div class="panel-body">
-							    <p>By Cash: <i class="fa fa-rupee extraPaddingLeftRight5 "></i><span id="cashTotal">0.00</span></p>
-							    <p>By Cheque : <i class="fa fa-rupee extraPaddingLeftRight5 "></i><span id="chequeTotal">0.00</span></p>
-							 </div>
+							</table>
+							<input type="submit" class="btn btn-primary pull-right" value="Save">
 						</div>
-				</div>
-			</div>	
-		</form:form>
-	</div>		
-	<div class="container">
-		<div class="row">
-			<hr/>
-			<div class="col-md-12" id="success">
-	            <div class="alert alert-success" >
-	              <button type="button" class="close" data-dismiss="alert">&times;</button>
-	              <strong>Well done!</strong> ${message}
-	            </div>
-	        </div>
-	        <div class="col-md-12" id="failure">
-	            <div class="alert alert-danger" >
-	              <button type="button" class="close" data-dismiss="alert">&times;</button>
-	              <strong>Oh snap!</strong> ${message}
-	            </div>
-	        </div>
-			<div>
-				<div class="col-md-4">
-					<a id="addExpense" onClick="enableExpenseInput();"><i class="fa fa-plus-square extraPaddingLeftRight5"></i>Add Expenses</a>
-				</div>
-				<div class="col-md-4 pull-right">
-					<div id="reportrange" class="form-control" style="cursor: pointer;margin-bottom:10px;">
-	                  <i class="fa fa-calendar"></i>
-	                  <span></span>
-	                  <form id="dateChange" method="post" action="/AccountmateWS/recordExpenses">
-	                  	<input type="hidden" id="startdate" name="startdate" value=""/>
-	                  	<input type="hidden" id="enddate" name="enddate" value=""/> 
-	                  </form>
-	            	</div>
-				</div>				
+						<div class="col-md-3">
+							<div class="panel panel-success">
+								<div class="panel-heading">Total</div>
+								  <div class="panel-body">
+								    <p>By Cash: <i class="fa fa-rupee extraPaddingLeftRight5 "></i><span id="cashTotal">0.00</span></p>
+								    <p>By Cheque : <i class="fa fa-rupee extraPaddingLeftRight5 "></i><span id="chequeTotal">0.00</span></p>
+								 </div>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<hr/>
+						</div>
+				</form:form>
 			</div>
-
-	        <div class="col-md-12">
+			<div class="col-md-4">
+				<a id="addExpense" onClick="enableExpenseInput();"><i class="fa fa-plus-square extraPaddingLeftRight5"></i>Add Expenses</a>
+			</div>
+			<div class="col-md-4 pull-right">
+				<div id="reportrange" class="form-control" style="cursor: pointer;margin-bottom:10px;">
+                  <i class="fa fa-calendar"></i>
+                  <span></span>
+                  <form id="dateChange" method="post" action="/AccountmateWS/recordExpenses">
+                  	<input type="hidden" id="startdate" name="startdate" value=""/>
+                  	<input type="hidden" id="enddate" name="enddate" value=""/> 
+                  </form>
+            	</div>
+			</div>		
+			<div class="col-md-12">
 				<div class="panel-group" id="accordion">
 					<c:forEach var="expensedetails" items="${expensesdetails}" varStatus="loop">
 		    			<div class="panel panel-default" id="panel${loop.index}">
@@ -227,51 +196,66 @@ pageEncoding="ISO-8859-1"%>
 		    		</c:forEach>
 				</div>
 			</div>
-		</div>
-		<!----Delete Expense Modal--->
-		<div class="modal fade" id="expenseDelete" tabinex="-1" role="dialog" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-						<div class="modal-header">
-							<h2>Are you sure ?</h2>
-						</div>
-						<div class="modal-body">
-							<p>Deleting the expense will remove its cash/cheque transaction entries as well.</p>
-							<p id="confirmquestion">Are you sure you want to delete <label id="expenseDescription"></label> ?</p>
-						</div>
-						<div class="modal-footer">
-							<form:form class="form-inline" id="expensedeleteform" method="post" action="/AccountmateWS/deleteExpense">
-								<input type="hidden" id="deleteexpenseid" name="expenseID" value = ""/>
-								<input type="hidden" id="redirectstartdate" name="redirectstartdate" value = ""/>
-								<input type="hidden" id="redirectenddate" name="redirectenddate" value =""/>
-								<button id="deletebutton" type="submit" class="btn btn-danger">Delete</button>
-								<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-							</form:form>
-						</div>
+			<!----Delete Expense Modal--->
+			<div class="modal fade" id="expenseDelete" tabinex="-1" role="dialog" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+							<div class="modal-header">
+								<h2>Are you sure ?</h2>
+							</div>
+							<div class="modal-body">
+								<p>Deleting the expense will remove its cash/cheque transaction entries as well.</p>
+								<p id="confirmquestion">Are you sure you want to delete <label id="expenseDescription"></label> ?</p>
+							</div>
+							<div class="modal-footer">
+								<form:form class="form-inline" id="expensedeleteform" method="post" action="/AccountmateWS/deleteExpense">
+									<input type="hidden" id="deleteexpenseid" name="expenseID" value = ""/>
+									<input type="hidden" id="redirectstartdate" name="redirectstartdate" value = ""/>
+									<input type="hidden" id="redirectenddate" name="redirectenddate" value =""/>
+									<button id="deletebutton" type="submit" class="btn btn-danger">Delete</button>
+									<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+								</form:form>
+							</div>
+					</div>
 				</div>
 			</div>
-		</div>
-		<!-- Edit Product Modal -->
-		<div class="modal fade" id="editExpense" tabinex="-1" role="dialog" aria-hidden="true">
-			<div class="modal-dialog">
-				<div id="expense-content" class="modal-content">
-						<%@include file="editexpense.jsp" %>
+			<!-- Edit Product Modal -->
+			<div class="modal fade" id="editExpense" tabinex="-1" role="dialog" aria-hidden="true">
+				<div class="modal-dialog">
+					<div id="expense-content" class="modal-content">
+							<%@include file="../expense/editexpense.jsp" %>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 	
 	<!-- Footer -->
-	<%@include file="footer.jsp" %>
+	<%@include file="../layout/footernew.jsp" %>
 	<!--  -- -- -->
+	<script>
+	$('input[type=text].price').keypress(function (e) {
+    var regex = new RegExp("^[0-9.]+$");
+    var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+    if (regex.test(str)) {
+        return true;
+    }
+
+    e.preventDefault();
+    return false;
+	});
 	
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-	<script src="resources/js/jquery.js"></script>
-    <script src="resources/js/bootstrap.min.js"></script>
-    <script src="resources/js/bootstrapValidator.js"></script>
-    <script src="resources/js/bootstrap-formhelpers.min.js"></script>
-    <script type="text/javascript" src="resources/js/moment.js"></script>
-    <script type="text/javascript" src="resources/js/daterangepicker.js"></script>
+	$('input[type=text].description').keypress(function (e) {
+	    var regex = new RegExp("^[a-z A-Z0-9_]+$");
+	    var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+	    if (regex.test(str)) {
+	        return true;
+	    }
+
+	    e.preventDefault();
+	    return false;
+		});
+	</script>
     <script type="text/javascript">
        $(document).ready(function() {
           var cb = function(start, end, label) {
@@ -288,8 +272,6 @@ pageEncoding="ISO-8859-1"%>
        var optionSet = {
          startDate: moment().subtract(29, 'days'),
          endDate: moment(),
-
-         dateLimit: { days: 60 },
          showDropdowns: true,
          showWeekNumbers: true,
          timePicker: false,
@@ -329,10 +311,6 @@ pageEncoding="ISO-8859-1"%>
        $('#enddate').val(moment("${enddate}").format('YYYY-MM-DD'));
        
        var optionSet2 = {
-    	         //startDate: moment().subtract(29, 'days'),
-    	         //endDate: moment(),
-
-    	         //dateLimit: { days: 60 },
     	         showDropdowns: true,
     	         showWeekNumbers: false,
     	         timePicker: false,
@@ -368,11 +346,8 @@ pageEncoding="ISO-8859-1"%>
        $('#expensedate input').val(moment().format('YYYY-MM-DD'));
        $('#expensedate').daterangepicker(optionSet2, cb2);
 	});
-       
-   
     </script>
     <script>
-    	$('#expense-input').hide();
     	function enableExpenseInput(){
     		$('#expense-input').show();
     		$('#addExpense').hide();
@@ -407,12 +382,16 @@ pageEncoding="ISO-8859-1"%>
     	function calcTotal(){
     		var cashTotal = 0;
     		var chequeTotal =0;
+    		var amount=0;
     		$('.rowid').each(function(index, element) {
+    			if($('#amount'+$(element).val()).val() != ''){
+    				amount=$('#amount'+$(element).val()).val();
+    			}
     			if($('#by'+$(element).val()).val() == 2){
-    				chequeTotal = chequeTotal + parseFloat($('#amount'+$(element).val()).val());
+    				chequeTotal = chequeTotal + parseFloat(amount);
     			}
     			else{
-    				cashTotal = cashTotal + parseFloat($('#amount'+$(element).val()).val());
+    				cashTotal = cashTotal + parseFloat(amount);
     			}
     		});
     		document.getElementById('cashTotal').innerHTML=number_format(cashTotal);
@@ -472,20 +451,5 @@ pageEncoding="ISO-8859-1"%>
 			document.getElementById("failure").style.display = "none";
 		}
 	</script>
-	<script type="text/javascript">
-    $(window).load(function(){
-    	if('<%=login%>' == "success")
-    	{
-    		document.getElementById("leftnav").style.display= "block";
-    		document.getElementById("logoutnav").style.display="block";
-    	}
-    	else{
-    		document.getElementById("leftnav").style.display= "none";
-    		document.getElementById("logoutnav").style.display="none";
-    	}
-        
-    });	
-	</script>
-	
   </body>
 </html>

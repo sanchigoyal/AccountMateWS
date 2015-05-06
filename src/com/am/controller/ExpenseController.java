@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.am.constants.AccountConstants;
 import com.am.helper.Helper;
 import com.am.model.bean.CategoryBean;
 import com.am.model.bean.ClientBean;
@@ -35,20 +36,28 @@ public class ExpenseController {
 	static Logger LOGGER = Logger.getLogger(ExpenseController.class.getName());
 	ExpenseDAO expenseDAO = new ExpenseDAOImpl();
 	ClientDAO clientDAO = new ClientDAOImpl();
+	/**
+	 * Method to get record expense page
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/recordExpenses")
 	   public String getExpensePage(ModelMap model,HttpServletRequest request){
 	    List<CategoryBean> categories = new ArrayList<CategoryBean>();
 	    List<ExpenseBeanList> expensesDetails = new ArrayList<ExpenseBeanList>();
 	    List<ClientBean> banks = new ArrayList<ClientBean>();
+	    ExpenseBean expense = new ExpenseBean();
+	    
 	    HttpSession session = request.getSession();
-		 if(session.getAttribute("userid")== null){
+		 if(session.getAttribute(AccountConstants.USER_NAME)== null){
 		 	return "home";
 		 }
 	    expenseDAO.getExpenseCategories(categories);
-	    int userid=Integer.parseInt((String)session.getAttribute("userid"));
+	    expense.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 	    model.addAttribute("categories",categories);
 	    model.addAttribute("command", new ExpenseBeanList());
-	    clientDAO.getClientsDetails(userid,banks,4);
+	    clientDAO.getClientsDetails(expense.getUserID(),banks,4);
 	    model.addAttribute("banks",banks);
 	    Map<String,String> dates = new HashMap<String,String>();
 	    if(request.getParameter("startdate")!= null && !request.getParameter("startdate").equals("")){
@@ -57,15 +66,15 @@ public class ExpenseController {
 		}
 		else{
 			dates = Helper.getDateRange();
-			LOGGER.debug("Requested Date Range - Current Month :: User - "+userid);
+			LOGGER.debug("Requested Date Range - Current Month :: User - "+expense.getUserID());
 		}
-		LOGGER.debug("Requested Date Range - "+dates.get("startdate")+" to "+dates.get("enddate")+" :: User - "+userid);
+		LOGGER.debug("Requested Date Range - "+dates.get("startdate")+" to "+dates.get("enddate")+" :: User - "+expense.getUserID());
 
-		expenseDAO.getExpensesDetails(expensesDetails, userid, dates);
+		expenseDAO.getExpensesDetails(expensesDetails,expense.getUserID(), dates);
 		model.addAttribute("expensesdetails", expensesDetails);
 		model.addAttribute("startdate", dates.get("startdate"));
 		model.addAttribute("enddate", dates.get("enddate"));
-		return "expenses";
+		return "expense/expenses";
 	   }
 
 	
@@ -73,16 +82,16 @@ public class ExpenseController {
 	public String saveExpenses(@ModelAttribute("AccountmateWS")ExpenseBeanList expensesIn, ModelMap model,HttpServletRequest request){
 		HttpSession session = request.getSession();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		boolean flag = false;
-		if(session.getAttribute("userid")== null){
-			return "home";
-		}
-		int userid=Integer.parseInt((String)session.getAttribute("userid"));
-		LOGGER.info("Request to save expenses :: User - "+userid);
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
 		List<ExpenseBeanList> expensesDetails = new ArrayList<ExpenseBeanList>();
+		boolean flag = false;
+		if(session.getAttribute(AccountConstants.USER_NAME)== null){
+			return "home";
+		}
+		
 		ExpenseBeanList expenses = filterExpenses(expensesIn);
-		expenses.setUserID(userid);
+		expenses.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
+		LOGGER.info("Request to save expenses :: User - "+expenses.getUserID());
 		try {
 			Date date = formatter.parse(request.getParameter("expdate"));
 			expenses.setDate(date);
@@ -115,17 +124,17 @@ public class ExpenseController {
 		}
 		else{
 			dates = Helper.getDateRange();
-			LOGGER.debug("Requested Date Range - Current Month :: User - "+userid);
+			LOGGER.debug("Requested Date Range - Current Month :: User - "+expenses.getUserID());
 		}
-		LOGGER.debug("Requested Date Range - "+dates.get("startdate")+" to "+dates.get("enddate")+" :: User - "+userid);
-		expenseDAO.getExpensesDetails(expensesDetails, userid, dates);
+		LOGGER.debug("Requested Date Range - "+dates.get("startdate")+" to "+dates.get("enddate")+" :: User - "+expenses.getUserID());
+		expenseDAO.getExpensesDetails(expensesDetails,expenses.getUserID(), dates);
 		model.addAttribute("expensesdetails", expensesDetails);
 		model.addAttribute("startdate", dates.get("startdate"));
 		model.addAttribute("enddate", dates.get("enddate"));
 		List<ClientBean> banks = new ArrayList<ClientBean>();
-		clientDAO.getClientsDetails(userid,banks,4);
+		clientDAO.getClientsDetails(expenses.getUserID(),banks,4);
 	    model.addAttribute("banks",banks);
-		return "expenses";
+		return "expense/expenses";
 	}
 	
 	@RequestMapping(value = "/viewExpense", method = RequestMethod.GET)
@@ -133,12 +142,12 @@ public class ExpenseController {
 		HttpSession session = request.getSession();
 		ExpenseBean expense = new ExpenseBean();
 		expense.setExpenseID(Integer.parseInt(expenseid));
-		expense.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
+		expense.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to view expense :: Expense ID - "+expense.getExpenseID()+" :: User - "+expense.getUserID());
 		expenseDAO.getExpenseDetails(expense);
 		model.addAttribute("expense",expense);
 		ModelAndView mav = new ModelAndView();
-		String viewName = "expense";
+		String viewName = "expense/expense";
 		mav.setViewName(viewName);
 		return mav;
 	}
@@ -148,14 +157,14 @@ public class ExpenseController {
 		HttpSession session = request.getSession();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		boolean flag = false;
-		if(session.getAttribute("userid")== null){
+		if(session.getAttribute(AccountConstants.USER_NAME)== null){
 			return "home";
 		}
-		int userid=Integer.parseInt((String)session.getAttribute("userid"));
-		LOGGER.info("Request to save expenses :: User - "+userid);
+		expense.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
+		LOGGER.info("Request to save expenses :: User - "+expense.getUserID());
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
 		List<ExpenseBeanList> expensesDetails = new ArrayList<ExpenseBeanList>();
-		expense.setUserID(userid);
+		
 		try {
 			Date date = formatter.parse(request.getParameter("expmodaldate"));
 			expense.setExpenseDate(date);
@@ -188,17 +197,17 @@ public class ExpenseController {
 		}
 		else{
 			dates = Helper.getDateRange();
-			LOGGER.debug("Requested Date Range - Current Month :: User - "+userid);
+			LOGGER.debug("Requested Date Range - Current Month :: User - "+expense.getUserID());
 		}
-		LOGGER.debug("Requested Date Range - "+dates.get("startdate")+" to "+dates.get("enddate")+" :: User - "+userid);
-		expenseDAO.getExpensesDetails(expensesDetails, userid, dates);
+		LOGGER.debug("Requested Date Range - "+dates.get("startdate")+" to "+dates.get("enddate")+" :: User - "+expense.getUserID());
+		expenseDAO.getExpensesDetails(expensesDetails, expense.getUserID(), dates);
 		model.addAttribute("expensesdetails", expensesDetails);
 		model.addAttribute("startdate", dates.get("startdate"));
 		model.addAttribute("enddate", dates.get("enddate"));
 		List<ClientBean> banks = new ArrayList<ClientBean>();
-		clientDAO.getClientsDetails(userid,banks,4);
+		clientDAO.getClientsDetails(expense.getUserID(),banks,4);
 	    model.addAttribute("banks",banks);
-		return "expenses";
+		return "expense/expenses";
 	}
 	
 	@RequestMapping("/deleteExpense")
@@ -207,10 +216,10 @@ public class ExpenseController {
 	    List<ExpenseBeanList> expensesDetails = new ArrayList<ExpenseBeanList>();
 		HttpSession session = request.getSession();
 		boolean flag =false;
-		if(session.getAttribute("userid")== null){
+		if(session.getAttribute(AccountConstants.USER_NAME)== null){
 			return "home";
 		}
-		expense.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
+		expense.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
 		LOGGER.info("Request to delete a expense :: Expense ID - "+expense.getExpenseID()+" :: User - "+expense.getUserID());
 		Map<String,String> dates = new HashMap<String,String>();
 		dates.put("startdate",request.getParameter("redirectstartdate"));
@@ -237,18 +246,18 @@ public class ExpenseController {
 		List<ClientBean> banks = new ArrayList<ClientBean>();
 		clientDAO.getClientsDetails(expense.getUserID(),banks,4);
 	    model.addAttribute("banks",banks);
-		return "expenses";
+		return "expense/expenses";
 	}
 	
 	@RequestMapping(value = "/editExpense", method = RequestMethod.GET)
 	public ModelAndView editExpense(@RequestParam("expenseid") String expenseid,ModelMap model, HttpServletRequest request){
 		HttpSession session = request.getSession();
 		List<CategoryBean> categories = new ArrayList<CategoryBean>();
-		LOGGER.info("Request to edit expense :: User - "+session.getAttribute("userid"));
 		ExpenseBean expense = new ExpenseBean();
 		expense.setExpenseID(Integer.parseInt(expenseid));
-		expense.setUserID(Integer.parseInt((String)session.getAttribute("userid")));
-		LOGGER.debug("Requested Expense ID - "+expense.getExpenseID()+" :: User - "+session.getAttribute("userid"));
+		expense.setUserID(Integer.parseInt((String)session.getAttribute(AccountConstants.USER_NAME)));
+		LOGGER.info("Request to edit expense :: User - "+expense.getUserID());
+		LOGGER.debug("Requested Expense ID - "+expense.getExpenseID()+" :: User - "+expense.getUserID());
 		expenseDAO.getExpenseDetails(expense);
 		model.addAttribute("expense",expense);
 		model.addAttribute("command",new ExpenseBean());
@@ -258,7 +267,7 @@ public class ExpenseController {
 		clientDAO.getClientsDetails(expense.getUserID(),banks,4);
 	    model.addAttribute("banks",banks);
 		ModelAndView mav = new ModelAndView();
-		String viewName = "editexpense";
+		String viewName = "expense/editexpense";
 		mav.setViewName(viewName);
 		return mav;		
 	}

@@ -6,70 +6,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-
     <title>Accountmate v1.2</title>
-
-    <!-- Bootstrap core CSS -->
-    <link href="resources/css/bootstrap.min.css" rel="stylesheet">
-    <link href="resources/css/font-awesome.min.css" rel="stylesheet">
-	<link href="resources/css/style.css" rel="stylesheet">
-	<link href="resources/css/bootstrapValidator.css" rel="stylesheet">
-	<link href="resources/css/bootstrap-formhelpers.min.css" rel="stylesheet">
-	<link href="resources/css/select2.css" rel="stylesheet"/>
-	<link href="resources/css/select2-bootstrap.css" rel="stylesheet"/>
-	<link rel="stylesheet" type="text/css" media="all" href="resources/css/daterangepicker-bs3.css" />
   </head>
 
   <body>
-	<%
-		//allow access only if session exists
-		String userid = null;
-		String login = null;
-		if(session.getAttribute("userid") == null){
-		    response.sendRedirect("/AccountmateWS/start");
-		}else {
-				userid = (String) session.getAttribute("userid");
-				login = (String) session.getAttribute("login");
-		}
-	%>
     <!-- Header -->
-    <%@include file="header.jsp" %>
+    <%@include file="../layout/headernew.jsp" %>
 	<!-- -- --- -->
 	
 	<div class="container">
 		<div class="row">
-			<div>
+			<div class="col-md-12">
 				<h2>Payment</h2><hr/>
-				<div id="success">
+			</div>
+			<div class="col-md-12">
+				<div id="success" class="hideIt">
 		            <div class="alert alert-success">
 		              <button type="button" class="close" data-dismiss="alert">&times;</button>
 		              <strong>Well done!</strong> Payment successful.
 		            </div>
 		        </div>
-		        <div id="failure">
+		        <div id="failure" class="hideIt">
 		            <div class="alert alert-danger">
 		              <button type="button" class="close" data-dismiss="alert">&times;</button>
 		              <strong>Oh snap!</strong> Failed to make the payment. Please check with support team for assistance.
 		            </div>
 		        </div>
-		        <%@include file="paymentgateway.jsp" %>
+			</div>
+			<div class="col-md-12">
+				<%@include file="../payment/paymentgateway.jsp" %>
 			</div>
 		</div>
 	</div>
 	
 	
 	<!-- Footer -->
-	<%@include file="footer.jsp" %>
+	<%@include file="../layout/footernew.jsp" %>
 	<!--  -- -- -->
-	
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-	<script src="resources/js/jquery.js"></script>
-    <script src="resources/js/bootstrap.min.js"></script>
-    <script src="resources/js/bootstrapValidator.js"></script>
-    <script src="resources/js/bootstrap-formhelpers.min.js"></script>
-    <script src="resources/js/select2.js"></script>
-    <script type="text/javascript" src="resources/js/moment.js"></script>
-    <script type="text/javascript" src="resources/js/daterangepicker.js"></script>
     <script>
 		if("${success}" == "true")
 		{
@@ -85,21 +58,6 @@
 			document.getElementById("failure").style.display = "none";
 		}
 	</script>
-	<script type="text/javascript">
-    $(window).load(function(){
-    	if('<%=login%>' == "success")
-    	{
-    		document.getElementById("leftnav").style.display= "block";
-    		document.getElementById("logoutnav").style.display="block";
-    	}
-    	else{
-    		document.getElementById("leftnav").style.display= "none";
-    		document.getElementById("logoutnav").style.display="none";
-    	}
-        
-    });	
-	</script>
-	
 	<script>
 		$("#clientname").select2();
 		$("#billnumber").attr("multiple","multiple");

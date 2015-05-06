@@ -16,7 +16,7 @@
 
   <body>
     <!-- Header -->
-    <%@include file="../headernew.jsp" %>
+    <%@include file="../layout/headernew.jsp" %>
 	<!-- -- --- -->
 	
 	<div class="container">
@@ -166,7 +166,7 @@
 			<div class="modal fade" id="viewInvoice" tabinex="-1" role="dialog" aria-hidden="true">
 				<div class="modal-dialog large">
 					<div id="invoice-content" class="modal-content">
-							<%@include file="../invoice.jsp" %>
+							<%@include file="../invoice/invoice.jsp" %>
 					</div>
 				</div>
 			</div>
@@ -179,7 +179,7 @@
 							<h2>Payment</h2>
 						</div>
 						<div id="payment-content" class="modal-body">
-							<%@include file="../paymentgateway.jsp" %>
+							<%@include file="../payment/paymentgateway.jsp" %>
 					    </div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
@@ -216,7 +216,7 @@
 	</div>
 	
 	<!-- Footer -->
-    <%@include file="../footernew.jsp" %>
+    <%@include file="../layout/footernew.jsp" %>
 	<!-- -- --- -->
     <script>
     function updateInvoiceModal(invoiceid){

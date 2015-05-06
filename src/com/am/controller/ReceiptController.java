@@ -74,7 +74,7 @@ public class ReceiptController {
 		clientDAO.getClientsDetails(client.getUserID(),banks,4);
 	    model.addAttribute("banks",banks);
 		ModelAndView mav = new ModelAndView();
-		String viewName = "receiptgateway";
+		String viewName = "receipt/receiptgateway";
 		mav.setViewName(viewName);
 		return mav;
 	}
@@ -91,7 +91,7 @@ public class ReceiptController {
 		model.addAttribute("receipt",receipt);
 		model.addAttribute("invoices",invoices);
 		ModelAndView mav = new ModelAndView();
-		String viewName = "receipt";
+		String viewName = "receipt/receipt";
 		mav.setViewName(viewName);
 		return mav;
 	}
@@ -120,7 +120,7 @@ public class ReceiptController {
 		model.addAttribute("total",total);
 		model.addAttribute("outstandingAmount",totalOutstanding);
 		ModelAndView mav = new ModelAndView();
-		String viewName = "receiptgatewaytables";
+		String viewName = "layout/gatewaytables";
 		mav.setViewName(viewName);
 		return mav;
 	}
@@ -156,7 +156,7 @@ public class ReceiptController {
 		List<ClientBean> banks = new ArrayList<ClientBean>();
 		clientDAO.getClientsDetails(userid,banks,4);
 	    model.addAttribute("banks",banks);
-		return "recordreceipt";
+		return "receipt/recordreceipt";
 	}
 	@RequestMapping("/saveReceiptDetails")
 	public String saveReceiptDetails(ModelMap model, HttpServletRequest request){
@@ -220,7 +220,7 @@ public class ReceiptController {
 			getTotalOutstanding(invoicesUnPaid);
 			model.addAttribute("unpaidOutstanding",totalOutstanding);
 			model.addAttribute("unpaidTotal",total);
-			return "salesbook";
+			return "invoice/salesbook";
 		}
 		
 		List<ClientBean> clients = new ArrayList<ClientBean>();
@@ -232,7 +232,7 @@ public class ReceiptController {
 	    model.addAttribute("banks",banks);
 		model.addAttribute("clients",clients);
 		model.addAttribute("invoices",invoices);
-		return "recordreceipt";
+		return "receipt/recordreceipt";
 	}
 	
 	private void getTotalOutstanding(List<InvoiceBean> invoices){
