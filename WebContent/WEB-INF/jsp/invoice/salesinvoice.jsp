@@ -348,20 +348,18 @@
 					">
 						<hr/>
 					</div>
-		        	<div class="col-md-12">
-						<div class="form-group">
-							<label for="detail text-left" class="col-md-2">Other Details</label>
+					<div class="form-group">
+						<label for="detail text-left" class="col-md-2">Other Details</label>
+					</div>
+					<div class="form-group">
+						<div class="col-md-4">
+							<textarea style="resize: none;" name="shippedTo" class="form-control" placeholder="Shipped to... " rows="3"></textarea>
 						</div>
-						<div class="form-group">
-							<div class="col-md-4">
-								<textarea style="resize: none;" name="shippedTo" class="form-control" placeholder="Shipped to... " rows="3"></textarea>
-							</div>
-							<div class="col-md-4">
-								<textarea  style="resize: none;" name="shippedMethod" class="form-control" placeholder="Shipping Method... " rows="3"></textarea>
-							</div>
-							<div class="col-md-4">
-								<textarea style="resize: none;" name="reference" class="form-control" placeholder="Reference... " rows="3"></textarea>
-							</div>
+						<div class="col-md-4">
+							<textarea  style="resize: none;" name="shippedMethod" class="form-control" placeholder="Shipping Method... " rows="3"></textarea>
+						</div>
+						<div class="col-md-4">
+							<textarea style="resize: none;" name="reference" class="form-control" placeholder="Reference... " rows="3"></textarea>
 						</div>
 					</div>
 					<div class="col-md-12">
