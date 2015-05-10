@@ -45,6 +45,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 	        cs.setDouble(9, invoice.getVatTotal());
 	        cs.setDouble(10, invoice.getTotal());
 	        cs.setInt(11, invoice.getUserID());
+	        cs.setInt(12, invoice.getCustomDaysToPay());
 	        rs=cs.executeQuery();
 	        if(rs.next()){
 	        	invoice.setInvoiceID(rs.getInt(InvoiceConstants.INVOICE_ID));
@@ -110,6 +111,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 	        cs.setDouble(9, invoice.getVatTotal());
 	        cs.setDouble(10, invoice.getTotal());
 	        cs.setInt(11, invoice.getUserID());
+	        cs.setInt(12, invoice.getCustomDaysToPay());
 	        rs=cs.executeQuery();
 	        if(rs.next()){
 	        	invoice.setInvoiceID(rs.getInt(InvoiceConstants.INVOICE_ID));
@@ -182,6 +184,10 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 	        	invoice.setVatTotal(rsClient.getDouble(InvoiceConstants.VAT_TOTAL));
 	        	invoice.setTotal(rsClient.getDouble(InvoiceConstants.TOTAL));
 	        	invoice.setOutstandingAmount(rsClient.getDouble(InvoiceConstants.OUTSTANDING_AMT));
+	        	invoice.setInvoiceStatus(rsClient.getString(InvoiceConstants.INVOICE_STATUS));
+	        	invoice.setCustomDaysToPay(rsClient.getInt(InvoiceConstants.CUSTOM_DAYS_TO_PAY));
+	        	invoice.setPaymentStatus(rsClient.getString(InvoiceConstants.PAYMENT_STATUS));
+	        	invoice.setDateDiff(rsClient.getInt(InvoiceConstants.DATE_DIFF));
 	        }
 			cs = con.prepareCall(InvoiceConstants.GET_INVOICE_ITEM);
 	        cs.setInt(1, invoice.getUserID());
@@ -198,6 +204,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 	        	items.add(item);
 	        }
 	        invoice.setItems(items);
+	        updateInvoicePaymentStatus(invoice);
 		}
 		catch(SQLException se){
 			LOGGER.error(se.getMessage(),se);
@@ -258,7 +265,12 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 	        	invoice.setBillNumber(rs.getString(InvoiceConstants.INVOICE_NUMBER));
 	        	invoice.setTotal(rs.getDouble(InvoiceConstants.TOTAL));
 	        	invoice.setOutstandingAmount(rs.getDouble(InvoiceConstants.OUTSTANDING_AMT));
-	        	if(rs.getString(InvoiceConstants.ACTIVE).equals("Y")){
+	        	invoice.setInvoiceStatus(rs.getString(InvoiceConstants.INVOICE_STATUS));
+	        	invoice.setCustomDaysToPay(rs.getInt(InvoiceConstants.CUSTOM_DAYS_TO_PAY));
+	        	invoice.setPaymentStatus(rs.getString(InvoiceConstants.PAYMENT_STATUS));
+	        	invoice.setDateDiff(rs.getInt(InvoiceConstants.DATE_DIFF));
+	        	updateInvoicePaymentStatus(invoice);
+	        	if(invoice.getInvoiceStatus().equals("ACTIVE")){
 		        	if(invoice.getOutstandingAmount() == 0){
 		        		invoicesPaid.add(invoice);
 		        	}
@@ -322,5 +334,33 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 			Connect.dropConnection(con);
 	    }
 		return flag;
+	}
+	
+	/**
+	 * Method to update invoice payment status
+	 * @param invoice
+	 */
+	void updateInvoicePaymentStatus(InvoiceBean invoice){
+		
+		if(invoice.getOutstandingAmount()==0){
+			//PAID
+			invoice.setPaymentStatus("PAID");
+		}
+		else if((invoice.getTotal()-invoice.getOutstandingAmount()) !=0 && invoice.getDateDiff()>invoice.getCustomDaysToPay()){
+			//DUE+PARTIALLY PAID
+			invoice.setPaymentStatus("DUE/PARTIALLY PAID");
+		}
+		else if((invoice.getTotal()-invoice.getOutstandingAmount())==0 && invoice.getDateDiff()>invoice.getCustomDaysToPay()){
+		//DUE+UNPAID
+			invoice.setPaymentStatus("DUE/UNPAID");
+		}
+		else if((invoice.getTotal()-invoice.getOutstandingAmount()) !=0){
+		//PARTIALLY PAID
+			invoice.setPaymentStatus("PARTIALLY PAID");
+		}
+		else{
+			invoice.setPaymentStatus("UNPAID");
+		}
+		//UNPAID
 	}
 }

@@ -161,6 +161,8 @@ public class InvoiceController {
 		return mav;
 	}
 	
+	
+	
 	/**
 	 * Method to save purchase invoice
 	 * @param iBean
@@ -446,6 +448,7 @@ public class InvoiceController {
 		invoice.setShippedTo(iBean.getShippedTo());
 		invoice.setShippedMethod(iBean.getShippedMethod());
 		invoice.setReference(iBean.getReference());
+		invoice.setCustomDaysToPay(iBean.getCustomDaysToPay());
 		for(ItemBean item :iBean.getItems()){
 			if(item.getProductID()!=0){
 				if(!item.getApplyVat()){

@@ -11,7 +11,8 @@ CREATE PROCEDURE savePurchaseInvoice(
 		 IN subTotal DECIMAL(10,2),
 		 IN vatTotal DECIMAL(10,2),
 		 IN total DECIMAL(10,2),
-		 IN userID INT
+		 IN userID INT,
+		 IN customDaysToPay INT
          )
 BEGIN
 DECLARE invoiceID INT DEFAULT 0;
@@ -19,7 +20,7 @@ DECLARE referenceTypeID INT DEFAULT 0;
 DECLARE actionID INT DEFAULT 0;
 call generateActionID('Save Purchase Invoice',actionID);
 SELECT reference_type_id into referenceTypeID from transaction_reference_type where reference_type = 'INVOICE';
-INSERT into invoice values(NULL,clientID,userID,clientTIN,invoiceDate,invoiceNumber,1,reference,shippedMethod,shippedTo,subTotal,vatTotal,total,'N',total,null,actionID);		
+INSERT into invoice values(NULL,clientID,userID,clientTIN,invoiceDate,invoiceNumber,1,reference,shippedMethod,shippedTo,subTotal,vatTotal,total,'N',total,null,actionID,customDaysToPay);		
 SELECT MAX(invoice_id) into invoiceID from invoice where client_id=clientID and user_id =userID;
 INSERT into client_transaction values(NULL,clientID,'PURCHASE',2,invoiceDate,0,total,0,invoiceID,referenceTypeID);
 
@@ -70,7 +71,11 @@ BEGIN
 select c.client_id,c.account_name,c.tin_number,
 		i.invoice_date,i.invoice_number,it.invoice_type,
 		i.reference,i.shipped_method,i.shipped_to,
-		i.sub_total,i.vat_total,i.total,i.outstanding_amt
+		i.sub_total,i.vat_total,i.total,i.outstanding_amt,
+		if(i.close_action_id is null,'ACTIVE','DELETED') INVOICE_STATUS,
+		if(i.custom_days_to_pay != 0,i.custom_days_to_pay,c.custom_days_pay) CUSTOM_DAYS_TO_PAY,
+		i.paid PAYMENT_STATUS,
+		DATEDIFF(CURDATE(),i.invoice_date) DATE_DIFF
 from invoice i ,client c,invoice_type it
 where it.invoice_type_id = i.invoice_type_id
 and c.client_id = i.client_id
@@ -109,50 +114,32 @@ if invoiceType = 1 then
 	select i.invoice_id,c.account_name,i.client_tin AS TIN_NUMBER,
 			i.invoice_date,i.invoice_number,it.invoice_type,
 			i.reference,i.shipped_method,i.shipped_to,
-			i.sub_total,i.vat_total,i.total,i.paid,i.outstanding_amt, 'Y' as ACTIVE
+			i.sub_total,i.vat_total,i.total,i.paid,i.outstanding_amt,
+			if(i.close_action_id is null,'ACTIVE','DELETED') INVOICE_STATUS,
+			if(i.custom_days_to_pay != 0,i.custom_days_to_pay,c.custom_days_pay) CUSTOM_DAYS_TO_PAY,
+			i.paid PAYMENT_STATUS,
+			DATEDIFF(CURDATE(),i.invoice_date) DATE_DIFF
 	from invoice i ,client c,invoice_type it
 	where i.user_id = userID
 	and it.invoice_type_id = invoiceType
 	and i.invoice_type_id =it.invoice_type_id
 	and c.client_id = i.client_id
-	and i.invoice_date between startdate and enddate
-	and i.close_action_id  is null
-	UNION ALL
-	select i.invoice_id,c.account_name,i.client_tin AS TIN_NUMBER,
-			i.invoice_date,i.invoice_number,it.invoice_type,
-			i.reference,i.shipped_method,i.shipped_to,
-			i.sub_total,i.vat_total,i.total,i.paid,i.outstanding_amt, 'N' as ACTIVE
-	from invoice i ,client c,invoice_type it
-	where i.user_id = userID
-	and it.invoice_type_id = invoiceType
-	and i.invoice_type_id =it.invoice_type_id
-	and c.client_id = i.client_id
-	and i.invoice_date between startdate and enddate
-	and i.close_action_id  is not null;
+	and i.invoice_date between startdate and enddate;
 else
 	select i.invoice_id,c.account_name,i.client_tin AS TIN_NUMBER,
 			i.invoice_date,i.invoice_number,it.invoice_type,
 			i.reference,i.shipped_method,i.shipped_to,
-			i.sub_total,i.vat_total,i.total,i.paid,i.outstanding_amt, 'Y' as ACTIVE
+			i.sub_total,i.vat_total,i.total,i.paid,i.outstanding_amt,
+			if(i.close_action_id is null,'ACTIVE','DELETED') INVOICE_STATUS,
+			if(i.custom_days_to_pay != 0,i.custom_days_to_pay,c.custom_days_pay) CUSTOM_DAYS_TO_PAY,
+			i.paid PAYMENT_STATUS,
+			DATEDIFF(CURDATE(),i.invoice_date) DATE_DIFF
 	from invoice i ,client c,invoice_type it
 	where i.user_id = userID
 	and it.invoice_type_id <> 1
 	and i.invoice_type_id =it.invoice_type_id
 	and c.client_id = i.client_id
-	and i.invoice_date between startdate and enddate
-	and i.close_action_id  is null
-	UNION ALL
-	select i.invoice_id,c.account_name,i.client_tin AS TIN_NUMBER,
-			i.invoice_date,i.invoice_number,it.invoice_type,
-			i.reference,i.shipped_method,i.shipped_to,
-			i.sub_total,i.vat_total,i.total,i.paid,i.outstanding_amt, 'N' as ACTIVE
-	from invoice i ,client c,invoice_type it
-	where i.user_id = userID
-	and it.invoice_type_id <> 1
-	and i.invoice_type_id =it.invoice_type_id
-	and c.client_id = i.client_id
-	and i.invoice_date between startdate and enddate
-	and i.close_action_id  is not null;
+	and i.invoice_date between startdate and enddate;
 end if;
 END//
 DELIMITER ;
@@ -220,7 +207,8 @@ CREATE PROCEDURE saveSalesInvoice(
 		 IN subTotal DECIMAL(10,2),
 		 IN vatTotal DECIMAL(10,2),
 		 IN total DECIMAL(10,2),
-		 IN userID INT
+		 IN userID INT,
+		 IN customDaysToPay INT
          )
 BEGIN
 DECLARE invoiceID INT DEFAULT 0;
@@ -236,7 +224,7 @@ into invoiceNumber from
 where
     user_id = userID
         and invoice_type_id = invoiceTypeID;
-INSERT into invoice values(NULL,clientID,userID,clientTIN,invoiceDate,invoiceNumber,invoiceTypeID,reference,shippedMethod,shippedTo,subTotal,vatTotal,total,'N',total,null,actionID);		
+INSERT into invoice values(NULL,clientID,userID,clientTIN,invoiceDate,invoiceNumber,invoiceTypeID,reference,shippedMethod,shippedTo,subTotal,vatTotal,total,'N',total,null,actionID,customDaysToPay);		
 SELECT MAX(invoice_id) into invoiceID from invoice where client_id=clientID and user_id =userID;
 INSERT into client_transaction values(NULL,clientID,'SALES',1,invoiceDate,total,0,0,invoiceID,referenceTypeID);
 UPDATE invoice_number_audit 

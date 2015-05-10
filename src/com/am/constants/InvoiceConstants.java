@@ -23,14 +23,18 @@ public class InvoiceConstants {
 	public static final String PRICE_WITH_VAT = "price_with_vat";
 	public static final String ITEM_TOTAL = "total";
 	public static final String ACTIVE ="ACTIVE";
+	public static final String INVOICE_STATUS="INVOICE_STATUS";
+	public static final String PAYMENT_STATUS="PAYMENT_STATUS";
+	public static final String CUSTOM_DAYS_TO_PAY ="CUSTOM_DAYS_TO_PAY";
+	public static final String DATE_DIFF = "DATE_DIFF";
 	
 	public static final String START_DATE = "startdate";
 	public static final String END_DATE = "enddate";
 	
 	/*---- Stored Procedures -----*/
-	public static final String SAVE_PURCHASE_INVOICE = "{call savePurchaseInvoice(?,?,?,?,?,?,?,?,?,?,?)}";
+	public static final String SAVE_PURCHASE_INVOICE = "{call savePurchaseInvoice(?,?,?,?,?,?,?,?,?,?,?,?)}";
 	public static final String SAVE_PURCHASE_ITEM_DETAILS = "{call savePurchaseItemDetails(?,?,?,?,?,?,?,?,?,?)}";
-	public static final String SAVE_SALES_INVOICE = "{call saveSalesInvoice(?,?,?,?,?,?,?,?,?,?,?)}";
+	public static final String SAVE_SALES_INVOICE = "{call saveSalesInvoice(?,?,?,?,?,?,?,?,?,?,?,?)}";
 	public static final String SAVE_SALES_ITEM_DETAILS = "{call saveSalesItemDetails(?,?,?,?,?,?,?,?,?)}";
 	public static final String GET_INVOICE_DETAILS = "{call getInvoiceDetails(?,?)}";
 	public static final String GET_INVOICE_ITEM = "{call getInvoiceItems(?,?)}";

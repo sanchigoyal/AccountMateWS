@@ -206,6 +206,20 @@
 							<input type="text" name="billNumber" class="form-control" placeholder="Enter invoice number.."/>
 						</div>
 					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label">Custom Days to Pay</label>
+						<div class="col-md-4">
+							<select id="customdaystopay" name="customDaysToPay" class="form-control">
+							  <option value="0">Supplier's Custom Days to Pay</option>
+							  <option value="10">10</option>
+							  <option value="15">15</option>
+							  <option value="20">20</option>
+							  <option value="25">25</option>
+							  <option value="30">30</option>
+							  <option value="45">45</option>
+							</select>
+						</div>
+					</div>
 					<hr/>
 					<div class="table-responsive">
 						<table class="table table-bordered table-striped" id="invoice-table">
@@ -298,25 +312,30 @@
 							</div>
 						</div>	
 					</div>
-					<div class="col-md-12">
-						<div class="form-group">
-							<label for="detail text-left" class="col-md-2">Other Details</label>
+					<div class="col-md-12" style="
+					    padding-left: 0px;
+					    padding-right: 0px;
+					">
+						<hr/>
+					</div>
+					<div class="form-group">
+						<label for="detail text-left" class="col-md-2">Other Details</label>
+					</div>
+					<div class="form-group">
+						<div class="col-md-4">
+							<textarea style="resize: none;" name="shippedTo" class="form-control" placeholder="Shipped to... " rows="3"></textarea>
 						</div>
-						<div class="form-group">
-							<div class="col-md-4">
-								<textarea style="resize: none;" name="shippedTo" class="form-control" placeholder="Shipped to... " rows="3"></textarea>
-							</div>
-							<div class="col-md-4">
-								<textarea  style="resize: none;" name="shippedMethod" class="form-control" placeholder="Shipping Method... " rows="3"></textarea>
-							</div>
-							<div class="col-md-4">
-								<textarea style="resize: none;" name="reference" class="form-control" placeholder="Reference... " rows="3"></textarea>
-							</div>
+						<div class="col-md-4">
+							<textarea  style="resize: none;" name="shippedMethod" class="form-control" placeholder="Shipping Method... " rows="3"></textarea>
+						</div>
+						<div class="col-md-4">
+							<textarea style="resize: none;" name="reference" class="form-control" placeholder="Reference... " rows="3"></textarea>
 						</div>
 					</div>
 					<div class="col-md-12">
+						
 						<div class="form-group">
-							<div class="col-md-offset-10 col-md-2">
+							<div class="col-md-2 col-md-offset-10">
 								<button type="submit" class="btn btn-primary btn-lg">Save</button>
 								<button type="reset" class="btn btn-default btn-lg">Clear</button>
 							</div>

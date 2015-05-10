@@ -21,8 +21,37 @@ public class InvoiceBean {
 	private int invoiceTypeID;
 	private String invoice_type;
 	private double outstandingAmount;
+	private int customDaysToPay;
+	private String invoiceStatus;
+	private String paymentStatus;
+	private int dateDiff;
 	
 	
+	
+	public int getDateDiff() {
+		return dateDiff;
+	}
+	public void setDateDiff(int dateDiff) {
+		this.dateDiff = dateDiff;
+	}
+	public String getInvoiceStatus() {
+		return invoiceStatus;
+	}
+	public void setInvoiceStatus(String invoiceStatus) {
+		this.invoiceStatus = invoiceStatus;
+	}
+	public String getPaymentStatus() {
+		return paymentStatus;
+	}
+	public void setPaymentStatus(String paymentStatus) {
+		this.paymentStatus = paymentStatus;
+	}
+	public int getCustomDaysToPay() {
+		return customDaysToPay;
+	}
+	public void setCustomDaysToPay(int customDaysToPay) {
+		this.customDaysToPay = customDaysToPay;
+	}
 	public double getOutstandingAmount() {
 		return outstandingAmount;
 	}

@@ -1,18 +1,43 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-		<div class="modal-header">
+		<div class="modal-header" style="height: 131.11111116409302px;">
 			<span class="col-md-12 text-center"><strong>${invoice.invoice_type} INVOICE</strong></span>
 			<div id="left" class="col-md-6" >
-				<h2>${invoice.clientName}</h2>
-				<p>TIN : ${invoice.clientTIN }</p>
+				<h2 style="margin-top: 10px;">${invoice.clientName}</h2>
+				<p>TIN : ${invoice.clientTIN }<br/>
+				<strong>Custom Days to Pay : ${invoice.customDaysToPay}</strong></p>
 			</div>
-			<div id="right">
-				</br></br>
-				<table class="pull-right">
-					<tr><td><strong>Invoice #</strong></td><td> ${invoice.billNumber}</td></tr>
-					<tr><td><strong>Date</strong></td><td> ${invoice.date}</td></tr>
+			<div id="right" class="col-md-3 col-md-offset-3" style="margin-top: 10px;">
+				<table class="">
+					<tr><td style="padding-right: 10px;"><strong>Invoice #</strong></td><td> ${invoice.billNumber}</td></tr>
+					<tr><td style="padding-right: 10px;"><strong>Date</strong></td><td> ${invoice.date}</td></tr>
 				</table>
+				<p>
+				<c:if test="${invoice.invoiceStatus eq 'ACTIVE'}">
+					<span class="text-primary"><strong>${invoice.invoiceStatus}</strong></span>
+				</c:if>
+				<c:if test="${invoice.invoiceStatus eq 'DELETED'}">
+					<span class="text-danger"><strong>${invoice.invoiceStatus}</strong></span>
+				</c:if>
+				<c:if test="${invoice.invoiceStatus eq 'ACTIVE'}">
+					<c:if test="${invoice.paymentStatus eq 'PAID'}">
+						<span class="text-success"><strong>${invoice.paymentStatus}</strong></span>
+					</c:if>
+					<c:if test="${invoice.paymentStatus eq 'DUE/PARTIALLY PAID'}">
+						<span class="text-danger"><strong>${invoice.paymentStatus}</strong></span>
+					</c:if>
+					<c:if test="${invoice.paymentStatus eq 'DUE/UNPAID'}">
+						<span class="text-danger"><strong>${invoice.paymentStatus}</strong></span>
+					</c:if>
+					<c:if test="${invoice.paymentStatus eq 'PARTIALLY PAID'}">
+						<span class="text-warning"><strong>${invoice.paymentStatus}</strong></span>
+					</c:if>
+					<c:if test="${invoice.paymentStatus eq 'UNPAID'}">
+						<span class="text-primary"><strong>${invoice.paymentStatus}</strong></span>
+					</c:if>
+				</c:if>
+				</p>
 			</div>
-			<br/><br/><br/>
+			<br/><br/><br/><br/>
 		</div>
 		<div class="modal-body">
 			<table id="invoice-table" class="table">

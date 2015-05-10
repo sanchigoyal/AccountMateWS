@@ -197,7 +197,7 @@
 			<div class="col-md-12">
 				<form:form id="invoiceForm" class="form-horizontal" method="post" action="/AccountmateWS/saveSalesInvoice">
 					<div class="form-group required">
-						<label class="col-md-2 control-label">Supplier Name</label>
+						<label class="col-md-2 control-label">Client Name</label>
 						<div class="col-md-4">
 							<select id="suppliername" name="clientID" class="form-control " onChange="updateTIN();">
 								<c:forEach var="client" items="${clients}">
@@ -226,6 +226,20 @@
 						<label class="col-md-2 control-label">TIN #</label>
 						<div class="col-md-4">
 							<input id="tinnumber" name ="clientTIN" type="text" class="form-control" value="${clients[0].clientTIN}" readOnly="readOnly"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-2 control-label">Custom Days to Pay</label>
+						<div class="col-md-4">
+							<select id="customdaystopay" name="customDaysToPay" class="form-control">
+							  <option value="0">Client's Custom Days to Pay</option>
+							  <option value="10">10</option>
+							  <option value="15">15</option>
+							  <option value="20">20</option>
+							  <option value="25">25</option>
+							  <option value="30">30</option>
+							  <option value="45">45</option>
+							</select>
 						</div>
 					</div>
 					<div class="form-group">
@@ -328,6 +342,12 @@
 							</div>
 		        		</div>
 		        	</div>
+		        	<div class="col-md-12" style="
+					    padding-left: 0px;
+					    padding-right: 0px;
+					">
+						<hr/>
+					</div>
 		        	<div class="col-md-12">
 						<div class="form-group">
 							<label for="detail text-left" class="col-md-2">Other Details</label>

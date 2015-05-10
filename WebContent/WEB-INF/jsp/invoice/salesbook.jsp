@@ -56,7 +56,7 @@
 				<div class="tab-content">
 					<div class="tab-pane active" id="tab1">
 						<br/>
-							<table class="table table-striped">
+							<table class="table table-hover">
 								<thead>
 									<tr class="well">
 										<td class="col-md-2 text-center">Date</td>
@@ -69,7 +69,17 @@
 								</thead>
 								<tbody>
 									<c:forEach var="invoiceup" items="${invoicesUP}">
-									<tr>
+									<tr class=" 
+										<c:if test="${invoiceup.paymentStatus eq 'DUE/PARTIALLY PAID'}">
+											danger
+										</c:if>
+										<c:if test="${invoiceup.paymentStatus eq 'DUE/UNPAID'}">
+											danger
+										</c:if>
+										<c:if test="${invoiceup.paymentStatus eq 'PARTIALLY PAID'}">
+											warning
+										</c:if>
+									">
 										<td class="text-center">${invoiceup.date}</td>
 										<td class="text-center">${invoiceup.clientName }</td>
 										<td class="text-center">
@@ -98,7 +108,7 @@
 					</div>
 					<div class="tab-pane" id="tab2">
 							<br/>
-							<table class="table table-striped">
+							<table class="table table-hover">
 								<thead>
 									<tr class="well">
 										<td class="col-md-2 text-center">Date</td>
@@ -110,7 +120,7 @@
 								</thead>
 								<tbody>
 									<c:forEach var="invoicep" items="${invoicesP}">
-									<tr>
+									<tr class="success">
 										<td class="text-center">${invoicep.date}</td>
 										<td class="text-center">${invoicep.clientName }</td>
 										<td class="text-center">

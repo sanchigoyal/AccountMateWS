@@ -304,3 +304,7 @@ CREATE TABLE receipt_invoice(
 	foreign key (invoice_id) references invoice(invoice_id),
 	amount DECIMAL(10,2)	
 );
+
+
+ALTER TABLE INVOICE
+ADD (custom_days_to_pay INT UNSIGNED);
